@@ -1,13 +1,9 @@
 // import reactLogo from './assets/react.svg'
 // import viteLogo from '/vite.svg'
-import './App.css'
 
 function App() {
-
   return (
-    <>
-      Home
-    </>
+      <h1 className="text-white h-screen w-full">Home</h1>
   )
 }
 
