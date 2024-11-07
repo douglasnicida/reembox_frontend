@@ -1,16 +1,16 @@
 import * as React from "react"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+// import {
+//   Table,
+//   TableBody,
+//   TableCell,
+//   TableHead,
+//   TableHeader,
+//   TableRow,
+// } from "@/components/ui/table"
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
+  // DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuCheckboxItem,
   DropdownMenuLabel,
@@ -18,11 +18,11 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+// import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { 
   Search, 
-  MoreVertical, 
+  // MoreVertical, 
   Users, 
   Home, 
   FileText, 
@@ -37,8 +37,10 @@ import {
   ChevronDown,
   Filter
 } from "lucide-react"
+import TableComponent from "@/components/custom_components/TableComponent"
+import { Collaborator } from "@/types/models.type"
 
-const collaborators = [
+const collaborators: Collaborator[] = [
   {
     name: "Breno Melo",
     cpf: "474.208.710-20",
@@ -98,12 +100,12 @@ export default function Component() {
     withoutAddress: false,
   })
   const [searchTerm, setSearchTerm] = React.useState("")
-  const [filteredCollaborators, setFilteredCollaborators] = React.useState(collaborators)
+  const [filteredCollaborators, setFilteredCollaborators] = React.useState<Collaborator[]>(collaborators)
 
   React.useEffect(() => {
     const results = collaborators.filter(collaborator => {
       const matchesSearch = Object.values(collaborator).some(value =>
-        value.toLowerCase().includes(searchTerm.toLowerCase())
+        typeof value === 'string' && value.toLowerCase().includes(searchTerm.toLowerCase())
       )
       
       const matchesFilter = (
@@ -218,54 +220,9 @@ export default function Component() {
 
         {/* Table */}
         <div className="p-4">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>CPF</TableHead>
-                <TableHead>Endereço</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead className="w-[50px]"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredCollaborators.map((collaborator) => (
-                <TableRow key={collaborator.cpf} className="hover:bg-zinc-800">
-                  <TableCell className="font-medium">{collaborator.name}</TableCell>
-                  <TableCell>
-                    <Badge 
-                      variant="outline" 
-                      className={collaborator.status === "Ativo" 
-                        ? "bg-green-400/15 text-green-400 border-green-400"
-                        : "bg-zinc-500/15 text-zinc-400 border-zinc-400"
-                      }
-                    >
-                      {collaborator.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{collaborator.cpf}</TableCell>
-                  <TableCell>{collaborator.address}</TableCell>
-                  <TableCell>{collaborator.email}</TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreVertical className="h-4 w-4" />
-                          <span className="sr-only">Open menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>Editar</DropdownMenuItem>
-                        <DropdownMenuItem>Excluir</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <TableComponent data={filteredCollaborators} columnHeaders={['Nome', 'Status', 'CPF', 'Endereço', 'Email']} />
         </div>
+
       </div>
     </div>
   )
