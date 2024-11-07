@@ -1,12 +1,4 @@
 import * as React from "react"
-// import {
-//   Table,
-//   TableBody,
-//   TableCell,
-//   TableHead,
-//   TableHeader,
-//   TableRow,
-// } from "@/components/ui/table"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,27 +10,15 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-// import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
 import { 
   Search, 
-  // MoreVertical, 
-  Users, 
-  Home, 
-  FileText, 
-  UserCheck, 
-  Briefcase, 
-  DollarSign, 
-  FileBarChart, 
-  Settings, 
-  Building2, 
-  LayoutGrid,
   Bell,
   ChevronDown,
   Filter
 } from "lucide-react"
 import TableComponent from "@/components/custom_components/TableComponent"
 import { Collaborator } from "@/types/models.type"
+// import Sidebar from "@/components/custom_components/Sidebar"
 
 const collaborators: Collaborator[] = [
   {
@@ -124,29 +104,7 @@ export default function Component() {
   }, [searchTerm, filterOptions])
 
   return (
-    <div className="dark flex h-screen bg-zinc-900 text-zinc-100">
-      {/* Sidebar */}
-      <div className="w-64 bg-zinc-800 p-4">
-        <div className="flex items-center gap-2 px-2 py-4 text-red-400">
-          <span className="text-2xl font-bold">Reembox</span>
-        </div>
-        <nav className="space-y-1">
-          <SidebarItem Icon={Home} label="Início" />
-          <Separator className="my-2 bg-zinc-700" />
-          <SidebarItem Icon={Users} label="Colaboradores" active />
-          <SidebarItem Icon={FileText} label="Ponto" />
-          <SidebarItem Icon={UserCheck} label="Perfil de Benefícios" />
-          <Separator className="my-2 bg-zinc-700" />
-          <SidebarItem Icon={Briefcase} label="Gestão" />
-          <SidebarItem Icon={DollarSign} label="Financeiro" />
-          <SidebarItem Icon={FileBarChart} label="Relatórios" />
-          <Separator className="my-2 bg-zinc-700" />
-          <SidebarItem Icon={Settings} label="Configurações" />
-          <SidebarItem Icon={Building2} label="Cargos Corporativos" />
-          <SidebarItem Icon={LayoutGrid} label="Departamentos" />
-        </nav>
-      </div>
-
+    <>
       {/* Main content */}
       <div className="flex-1 overflow-auto">
         <header className="flex items-center justify-between border-b border-zinc-700 bg-zinc-800 p-4">
@@ -224,26 +182,6 @@ export default function Component() {
         </div>
 
       </div>
-    </div>
-  )
-}
-
-interface SidebarProps {
-    Icon: React.ElementType,
-    label: string
-    active?: boolean
-}
-
-function SidebarItem({ Icon, label, active = false }: SidebarProps) {
-  return (
-    <Button
-      variant="ghost"
-      className={`w-full justify-start gap-2 ${
-        active ? 'bg-red-400 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-      }`}
-    >
-      <Icon className="h-5 w-5" />
-      {label}
-    </Button>
+    </>
   )
 }
