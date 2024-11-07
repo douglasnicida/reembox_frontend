@@ -18,6 +18,7 @@ import {
 } from "lucide-react"
 import TableComponent from "@/components/custom_components/TableComponent"
 import { Collaborator } from "@/types/models.type"
+import Header from "@/components/custom_components/Header.tsx";
 // import Sidebar from "@/components/custom_components/Sidebar"
 
 const collaborators: Collaborator[] = [
@@ -105,19 +106,7 @@ export default function Component() {
 
   return (
     <>
-      {/* Main content */}
       <div className="flex-1 overflow-auto">
-        <header className="flex items-center justify-between border-b border-zinc-700 bg-zinc-800 p-4">
-          <h1 className="text-2xl font-semibold">Colaboradores</h1>
-          <div className="flex items-center gap-4">
-            <Bell className="h-5 w-5" />
-            <Button variant="ghost" className="gap-2">
-              <span>Org</span>
-              <ChevronDown className="h-4 w-4" />
-            </Button>
-          </div>
-        </header>
-        
         {/* Search and filter bar */}
         <div className="flex items-center justify-between gap-4 border-b border-zinc-700 bg-zinc-800 p-4">
           <div className="relative flex-1">
