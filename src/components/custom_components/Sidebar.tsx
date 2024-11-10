@@ -1,4 +1,3 @@
-import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Separator } from "@/components/ui/separator"
 import {
@@ -57,7 +56,7 @@ export default function Sidebar() {
                     Icon={Home}
                     label="Início"
                     active={activeItem === "Início"}
-                    onClick={() => handleItemClick("Início", "/")}
+                    onClick={() => handleItemClick("Início", "/home")}
                 />
                 <Separator className="my-2 bg-zinc-700" />
                 <SidebarItem

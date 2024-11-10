@@ -3,14 +3,14 @@ import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
-import { Collaborator, Customer } from "@/types/models.type";
+import {Collaborator, Customer, Report} from "@/types/models.type";
 
 export interface TableProps<T> {
   data: T[];
   columnHeaders: string[];
 }
 
-export default function TableComponent<T extends Collaborator | Customer>({data, columnHeaders}: TableProps<T>) {
+export default function TableComponent<T extends Collaborator | Customer | Report>({data, columnHeaders}: TableProps<T>) {
   
   const GenerateTableCell = (item: T) => 
     Object.entries(item).map(([key, value]) => {

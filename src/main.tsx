@@ -6,15 +6,15 @@ import { ThemeProvider } from './components/theme-provider.tsx'
 import {ActiveItemProvider} from "@/context/ActiveItemContext.tsx";
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+    <StrictMode>
+        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
 
-      <div>
-          <ActiveItemProvider>
-        <AppRoute />
-          </ActiveItemProvider>
-      </div>
+            <div>
+                <ActiveItemProvider>
+                    <AppRoute />
+                </ActiveItemProvider>
+            </div>
 
-    </ThemeProvider>
-  </StrictMode>
+        </ThemeProvider>
+    </StrictMode>
 )

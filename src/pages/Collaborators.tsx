@@ -12,13 +12,13 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { 
   Search, 
-  Bell,
-  ChevronDown,
+  // Bell,
+  // ChevronDown,
   Filter
 } from "lucide-react"
 import TableComponent from "@/components/custom_components/TableComponent"
 import { Collaborator } from "@/types/models.type"
-import Header from "@/components/custom_components/Header.tsx";
+// import Header from "@/components/custom_components/Header.tsx";
 // import Sidebar from "@/components/custom_components/Sidebar"
 
 const collaborators: Collaborator[] = [

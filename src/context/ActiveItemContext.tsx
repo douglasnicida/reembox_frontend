@@ -1,12 +1,14 @@
-import React, { createContext, useContext, useState } from "react";
-import {useLocation} from "react-router-dom";
+import React, { createContext, useContext, useEffect, useState } from "react";
+// import {useLocation} from "react-router-dom";
 
 interface ActiveItemContextType {
     activeItem: string;
     setActiveItem: React.Dispatch<React.SetStateAction<string>>;
 }
-export const RoutesMap: Record<string, string> = {
-    "/": "Início",
+
+const RoutesMap: Record<string, string> = {
+    "/": "Login",
+    "/home": "Início",
     "/collabs": "Colaboradores",
     "/ponto": "Ponto",
     "/benefits": "Perfil de Benefícios",
@@ -30,10 +32,17 @@ export const useActiveItem = () => {
 
 export const ActiveItemProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
-    React.useEffect(() => {
-        setActiveItem('Início')
+    // TODO: implementar AuthContext para funcionar corretamente
+    const token = 'a';
+
+    useEffect(() => {
         const location = window.location.pathname;
-        setActiveItem(RoutesMap[location]);
+        
+        if(token.length > 0){
+            setActiveItem('Início')
+            setActiveItem(RoutesMap[location]);
+        }
+
     }, [window.location.pathname]);
 
     const [activeItem, setActiveItem] = useState<string>('');

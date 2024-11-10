@@ -14,3 +14,8 @@ export type Customer = {
     phone_number: string;
     status: boolean;
 }
+
+export type Report = {
+    id?: number;
+    goal: string;
+}
