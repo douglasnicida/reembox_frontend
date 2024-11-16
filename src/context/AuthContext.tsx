@@ -23,7 +23,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode}) => {
         try {
             const response = await api.post('/auth/login', credentials);
             const payload = response.data.payload;
-            console.log(response)
             
             setToken(payload.access_token);
             storeToken(payload.access_token);
