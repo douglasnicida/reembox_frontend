@@ -6,7 +6,7 @@ import {
     DropdownMenuLabel, DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu.tsx";
-import {Button} from "@/components/ui/button.tsx";
+import { Button } from "@/components/ui/button.tsx";
 import TableComponent from "@/components/custom_components/TableComponent.tsx";
 import * as React from "react";
 import { Report } from "@/types/models.type.ts";

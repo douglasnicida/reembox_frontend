@@ -1,6 +1,4 @@
 export type Paginated<T> = {
-    status: number;
-    message: string;
     payload: {
         items: Array<T>;
         totalItems: number;
@@ -8,4 +6,4 @@ export type Paginated<T> = {
         currentPage: number;
         size: number;
     },
- }
+}

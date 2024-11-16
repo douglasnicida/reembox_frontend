@@ -19,3 +19,12 @@ export type Report = {
     id?: number;
     goal: string;
 }
+
+export type CostCenter = {
+    id: number;
+    code: string;
+    description: string;
+    createdAt: string;
+    updatedAt: string;
+    active: boolean;
+}

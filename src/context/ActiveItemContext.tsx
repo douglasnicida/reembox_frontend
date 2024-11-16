@@ -9,15 +9,17 @@ interface ActiveItemContextType {
 const RoutesMap: Record<string, string> = {
     "/": "Login",
     "/home": "Início",
-    "/collabs": "Colaboradores",
-    "/ponto": "Ponto",
-    "/benefits": "Perfil de Benefícios",
-    "/management": "Gestão",
-    "/financial": "Financeiro",
     "/reports": "Relatórios",
+    "/expenses": "Despesas",
+    "/collaborators": "Colaboradores",
+    "/job-titles": "Cargos",
+    "/cost-centers": "Centro de Custo",
+    "/expense-categories": "Tipo de Despesa",
+    "/projects": "Projetos",
+    "/customers": "Clientes",
+    "/financial": "Financeiro",
+    "/approval": "Aprovação",
     "/config": "Configurações",
-    "/corporate": "Cargos Corporativos",
-    "/departments": "Departamentos",
 }
 
 const ActiveItemContext = createContext<ActiveItemContextType | undefined>(undefined);

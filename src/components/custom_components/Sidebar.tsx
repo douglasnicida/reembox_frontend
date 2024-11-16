@@ -4,16 +4,18 @@ import {
     Users,
     Home,
     FileText,
-    UserCheck,
-    Briefcase,
-    DollarSign,
-    FileBarChart,
     Settings,
-    Building2,
-    LayoutGrid,
+    BriefcaseBusiness,
+    Split,
+    Tag,
+    Handshake,
+    Building,
+    Landmark,
+    ThumbsUp,
+    Receipt,
 } from "lucide-react"
 import { Button } from "../ui/button"
-import {useActiveItem} from "@/context/ActiveItemContext.tsx";
+import { useActiveItem } from "@/context/ActiveItemContext.tsx";
 
 interface SidebarProps {
     Icon: React.ElementType,
@@ -23,17 +25,20 @@ interface SidebarProps {
 }
 
 function SidebarItem({ Icon, label, active, onClick }: SidebarProps) {
+    const hasBorder = (label === "Início" || label === "Configurações") ? "" : "mx-3.5 border-l border-zinc-700"
     return (
-        <Button
-            variant="ghost"
-            onClick={onClick}
-            className={`w-full justify-start gap-2 ${
-                active ? 'bg-red-400 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-            }`}
-        >
-            <Icon className="h-5 w-5" />
-            {label}
-        </Button>
+        <li className={`${hasBorder}`}>
+            <Button
+                variant="ghost"
+                onClick={onClick}
+                className={`mx-2 flex min-w-0 py-0.5 px-2.5 ${
+                    active ? 'bg-red-400 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                }`}
+                >
+                <Icon className="h-5 w-5" />
+                {label}
+            </Button>
+        </li>
     )
 }
 
@@ -51,7 +56,7 @@ export default function Sidebar() {
             <div className="flex items-center gap-2 px-2 py-4 text-red-400">
                 <span className="text-2xl font-bold">Reembox</span>
             </div>
-            <nav className="space-y-1">
+            <nav className="">
                 <SidebarItem
                     Icon={Home}
                     label="Início"
@@ -59,61 +64,79 @@ export default function Sidebar() {
                     onClick={() => handleItemClick("Início", "/home")}
                 />
                 <Separator className="my-2 bg-zinc-700" />
+                <p className="flex h-8 shrink-0 items-center text-xs font-medium text-sidebar-foreground/70">Reembolsos</p>
                 <SidebarItem
-                    Icon={Users}
-                    label="Colaboradores"
-                    active={activeItem === "Colaboradores"}
-                    onClick={() => handleItemClick("Colaboradores", "/collabs")}
+                    Icon={Receipt}
+                    label="Despesas"
+                    active={activeItem === "Despesas"}
+                    onClick={() => handleItemClick("Despesas", "/expenses")}
                 />
                 <SidebarItem
                     Icon={FileText}
-                    label="Ponto"
-                    active={activeItem === "Ponto"}
-                    onClick={() => handleItemClick("Ponto", "/ponto")}
-                />
-                <SidebarItem
-                    Icon={UserCheck}
-                    label="Perfil de Benefícios"
-                    active={activeItem === "Perfil de Benefícios"}
-                    onClick={() => handleItemClick("Perfil de Benefícios", "/benefits")}
-                />
-                <Separator className="my-2 bg-zinc-700" />
-                <SidebarItem
-                    Icon={Briefcase}
-                    label="Gestão"
-                    active={activeItem === "Gestão"}
-                    onClick={() => handleItemClick("Gestão", "/management")}
-                />
-                <SidebarItem
-                    Icon={DollarSign}
-                    label="Financeiro"
-                    active={activeItem === "Financeiro"}
-                    onClick={() => handleItemClick("Financeiro", "/financial")}
-                />
-                <SidebarItem
-                    Icon={FileBarChart}
                     label="Relatórios"
                     active={activeItem === "Relatórios"}
                     onClick={() => handleItemClick("Relatórios", "/reports")}
                 />
-                <Separator className="my-2 bg-zinc-700" />
+                <p className="flex h-8 shrink-0 items-center text-xs font-medium text-sidebar-foreground/70">Estrutura Organizacional</p>
+                <SidebarItem
+                    Icon={Users}
+                    label="Colaboradores"
+                    active={activeItem === "Colaboradores"}
+                    onClick={() => handleItemClick("Colaboradores", "/collaborators")}
+                />
+                <SidebarItem
+                    Icon={Building}
+                    label="Cargos"
+                    active={activeItem === "Cargos"}
+                    onClick={() => handleItemClick("Cargos", "/job-titles")}
+                />
+
+                <SidebarItem
+                    Icon={Split}
+                    label="Centro de Custos"
+                    active={activeItem === "Centro de Custos"}
+                    onClick={() => handleItemClick("Centro de Custos", "/cost-centers")}
+                />
+                <SidebarItem
+                    Icon={Tag}
+                    label="Tipo de Despesas"
+                    active={activeItem === "Tipo de Despesas"}
+                    onClick={() => handleItemClick("Tipo de Despesas", "/expense-categories")}
+                />
+                <p className="flex h-8 shrink-0 items-center px-2 text-xs font-medium text-sidebar-foreground/70">Relacionamentos</p>
+                <SidebarItem
+                    Icon={Handshake}
+                    label="Clientes"
+                    active={activeItem === "Clientes"}
+                    onClick={() => handleItemClick("Clientes", "/customers")}
+                />
+                <SidebarItem
+                    Icon={BriefcaseBusiness}
+                    label="Projetos"
+                    active={activeItem === "Projetos"}
+                    onClick={() => handleItemClick("Projetos", "/projects")}
+                />
+
+                <p className="flex h-8 shrink-0 items-center px-2 text-xs font-medium text-sidebar-foreground/70">Ações</p>
+                <SidebarItem
+                    Icon={ThumbsUp}
+                    label="Aprovação"
+                    active={activeItem === "Aprovação"}
+                    onClick={() => handleItemClick("Aprovação", "/approval")}
+                />
+                <SidebarItem
+                    Icon={Landmark}
+                    label="Financeiro"
+                    active={activeItem === "Financeiro"}
+                    onClick={() => handleItemClick("Financeiro", "/financial")}
+                />
+
+                <Separator className="mt-6 mb-3 bg-zinc-700" />
                 <SidebarItem
                     Icon={Settings}
                     label="Configurações"
                     active={activeItem === "Configurações"}
                     onClick={() => handleItemClick("Configurações", "/config")}
-                />
-                <SidebarItem
-                    Icon={Building2}
-                    label="Cargos Corporativos"
-                    active={activeItem === "Cargos Corporativos"}
-                    onClick={() => handleItemClick("Cargos Corporativos", "/corporate")}
-                />
-                <SidebarItem
-                    Icon={LayoutGrid}
-                    label="Departamentos"
-                    active={activeItem === "Departamentos"}
-                    onClick={() => handleItemClick("Departamentos", "/departments")}
                 />
             </nav>
         </div>

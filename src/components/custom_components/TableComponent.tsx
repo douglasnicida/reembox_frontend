@@ -2,38 +2,42 @@ import { MoreVertical } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
-import {Collaborator, Customer, Report} from "@/types/models.type";
+import { Table, TableHeader, TableRow, TableBody, TableCell, TableHead } from "../ui/table";
+import { handleFormatDate } from "@/utils/handleDate";
 
 export interface TableProps<T> {
   data: T[];
   columnHeaders: string[];
 }
 
-export default function TableComponent<T extends Collaborator | Customer | Report>({data, columnHeaders}: TableProps<T>) {
+export default function TableComponent<T extends Record<string, any>>({data, columnHeaders}: TableProps<T>) {
   
   const GenerateTableCell = (item: T) => 
     Object.entries(item).map(([key, value]) => {
-      const stringValue = value.toString();
+      let displayValue = String(value);
 
-      if (key === "status") {
+      if (typeof value === "string" || value instanceof Date) {
+        displayValue = handleFormatDate(value);
+      }
+
+      if (key === "active") {
         return (
           <TableCell key={key}>
             <Badge 
               variant="outline" 
-              className={stringValue === "Ativo" 
+              className={displayValue
                 ? "bg-green-400/15 text-green-400 border-green-400"
                 : "bg-zinc-500/15 text-red-400 border-red-400"
               }
             >
-              {stringValue}
+              {displayValue ? "Ativo" : "Inativo"}
             </Badge>
           </TableCell>
         );
       } else if (key === "name") {
-        return <TableCell key={key} className="font-bold">{stringValue}</TableCell>;
+        return <TableCell key={key} className="font-bold">{displayValue}</TableCell>;
       } else {
-        return <TableCell key={key}>{stringValue}</TableCell>;
+        return <TableCell key={key}>{displayValue}</TableCell>;
       }
     });
   
@@ -59,7 +63,7 @@ export default function TableComponent<T extends Collaborator | Customer | Repor
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon">
                           <MoreVertical className="h-4 w-4" />
-                          <span className="sr-only">Open menu</span>
+                          <span className="sr-only">Abrir menu</span>
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">

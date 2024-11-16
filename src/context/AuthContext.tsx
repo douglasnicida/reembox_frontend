@@ -17,19 +17,19 @@ const AuthProvider = ({ children }: { children: React.ReactNode}) => {
     const { setActiveItem } = useActiveItem();
     const { toast } = useToast();
 
-    
+
 
     const login = async (credentials: LoginType) => {
         try {
             const response = await api.post('/auth/login', credentials);
-            const payload = response.data.data;
+            const payload = response.data.payload;
 
             
             setToken(payload.access_token);
             storeToken(payload.access_token);
             
             const userResponse = await api.post('/auth/verify', {"access_token": payload.access_token})
-            const userPayload = userResponse.data.data
+            const userPayload = userResponse.data.payload
 
             setUser(userPayload)
             localStorage.setItem('user',JSON.stringify(userPayload))

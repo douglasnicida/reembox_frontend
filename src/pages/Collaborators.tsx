@@ -73,7 +73,7 @@ const collaborators: Collaborator[] = [
   }
 ]
 
-export default function Component() {
+export function Collaborators() {
   const [filterOptions, setFilterOptions] = React.useState({
     active: false,
     inactive: false,
@@ -118,6 +118,7 @@ export default function Component() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
+          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="gap-2">
@@ -125,6 +126,7 @@ export default function Component() {
                 <span>Filtros</span>
               </Button>
             </DropdownMenuTrigger>
+
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>Filtrar por</DropdownMenuLabel>
               <DropdownMenuSeparator />
@@ -144,6 +146,7 @@ export default function Component() {
               >
                 Inativos
               </DropdownMenuCheckboxItem>
+
               <DropdownMenuSeparator />
               <DropdownMenuCheckboxItem
                 checked={filterOptions.withAddress}
@@ -153,6 +156,7 @@ export default function Component() {
               >
                 Com endereço
               </DropdownMenuCheckboxItem>
+
               <DropdownMenuCheckboxItem
                 checked={filterOptions.withoutAddress}
                 onCheckedChange={(checked) =>
