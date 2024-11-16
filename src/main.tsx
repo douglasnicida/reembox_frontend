@@ -4,17 +4,21 @@ import './index.css'
 import AppRoute from './routes.tsx'
 import { ThemeProvider } from './components/theme-provider.tsx'
 import {ActiveItemProvider} from "@/context/ActiveItemContext.tsx";
+import { Toaster } from './components/ui/toaster.tsx'
+import AuthProvider from './context/AuthContext.tsx'
+import { BrowserRouter } from 'react-router-dom'
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-
-            <div>
+            <BrowserRouter>
                 <ActiveItemProvider>
-                    <AppRoute />
+                    <AuthProvider>
+                            <Toaster />
+                            <AppRoute />
+                    </AuthProvider>
                 </ActiveItemProvider>
-            </div>
-
+            </BrowserRouter>
         </ThemeProvider>
     </StrictMode>
 )
