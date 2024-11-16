@@ -44,7 +44,7 @@ export default function LoginPage() {
             </CardTitle>
             <p className="text-sm text-zinc-400">
               Insira seu email para acessar sua conta
-            </p>
+          </p>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">

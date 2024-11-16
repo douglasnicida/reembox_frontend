@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import App from './App';
 import { Collaborators } from './pages/Collaborators';
 import Sidebar from "@/components/custom_components/Sidebar.tsx";
@@ -7,9 +7,22 @@ import LoginPage from './pages/Login';
 import ReportsPage from "@/pages/Reports.tsx";
 import { useActiveItem } from './context/ActiveItemContext';
 import CostCenterPage from './pages/CostCenter';
+import { useEffect } from 'react';
 
 export default function AppRoute() {
-    const { activeItem } = useActiveItem();
+    const { activeItem, setActiveItem } = useActiveItem();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const storedUserInfo = localStorage.getItem('user');
+        const storedTokenInfo = localStorage.getItem('access_token');
+
+        if(!storedTokenInfo || !storedUserInfo) {
+            setActiveItem('Login');
+            navigate('/');
+        }
+    }, [navigate, setActiveItem])
+
     return (
         <div className="dark flex h-screen bg-zinc-900 text-zinc-100">
             { activeItem != 'Login' && <Sidebar/> }

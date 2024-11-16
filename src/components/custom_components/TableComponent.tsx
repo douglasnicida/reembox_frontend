@@ -42,8 +42,8 @@ export default function TableComponent<T extends Record<string, any>>({data, col
     });
   
   return (
-        <Table>
-            <TableHeader>
+        <Table className="rounded-md">
+            <TableHeader className="bg-zinc-800">
               <TableRow>
                 {
                     columnHeaders.map((header, index) => (

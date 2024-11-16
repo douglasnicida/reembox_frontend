@@ -17,8 +17,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode}) => {
     const { setActiveItem } = useActiveItem();
     const { toast } = useToast();
 
-
-
     const login = async (credentials: LoginType) => {
         try {
             const response = await api.post('/auth/login', credentials);

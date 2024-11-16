@@ -6,6 +6,7 @@ type MyError = {
 };
 
 export function errorHandler(err: AxiosError<MyError>) {
+
   const errorMessage =
     (err.response?.data?.message as string) || 
     err.message || 
@@ -15,4 +16,9 @@ export function errorHandler(err: AxiosError<MyError>) {
     description: errorMessage,
     variant: "destructive",
   });
+
+  if(err.status == 401) { 
+    localStorage.removeItem('access_token')
+    localStorage.removeItem('user')
+  }
 }

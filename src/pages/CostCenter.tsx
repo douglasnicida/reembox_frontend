@@ -1,11 +1,7 @@
 import * as React from "react";
 import {
   DropdownMenu,
-  DropdownMenuContent,
   DropdownMenuTrigger,
-  DropdownMenuCheckboxItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -104,7 +100,7 @@ export default function CostCenterPage() {
             columnHeaders={['Código', 'Descrição', 'Criado em', 'Atualizado em', 'Ativo']} 
           />
         </div>
-        <Pagination data={data} onPageChange={fetchCostCenters} />
+        <Pagination data={data} onPageChange={fetchCostCenters}/>
       </div>
       <Toaster />
     </>

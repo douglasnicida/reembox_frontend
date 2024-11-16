@@ -13,15 +13,107 @@ import {
     Landmark,
     ThumbsUp,
     Receipt,
+    ChevronsUpDown,
+    LogOut,
+    CircleUser,
 } from "lucide-react"
 import { Button } from "../ui/button"
 import { useActiveItem } from "@/context/ActiveItemContext.tsx";
+import { useEffect, useState } from "react";
+import api from "@/api/axios";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { useAuth } from "@/hooks/useAuth";
 
 interface SidebarProps {
     Icon: React.ElementType,
     label: string,
     active: boolean,
     onClick: () => void
+}
+
+const sideBarItems = {
+    "sections": [
+        {
+            "title": "Reembolsos",
+            "items": [
+                {
+                    "Icon": Receipt,
+                    "label": "Despesas",
+                    "path": "/expenses",
+                    "roles": []
+                },
+                {
+                    "Icon": FileText,
+                    "label": "Relatórios",
+                    "path": "/reports",
+                    "roles": []
+                }
+            ]
+        },
+        {
+            "title": "Estrutura Organizacional",
+            "items": [
+                {
+                    "Icon": Users,
+                    "label": "Colaboradores",
+                    "path": "/collaborators",
+                    "roles": ["ADMIN", "FINANCE"]
+                },
+                {
+                    "Icon": Building,
+                    "label": "Cargos",
+                    "path": "/job-titles",
+                    "roles": ["ADMIN"]
+                },
+                {
+                    "Icon": Split,
+                    "label": "Centros de Custo",
+                    "path": "/cost-centers",
+                    "roles": ["ADMIN", "FINANCE"]
+                },
+                {
+                    "Icon": Tag,
+                    "label": "Tipos de Despesa",
+                    "path": "/expense-categories",
+                    "roles": ["ADMIN", "FINANCE"]
+                }
+            ]
+        },
+        {
+            "title": "Relacionamentos",
+            "items": [
+                {
+                    "Icon": Handshake,
+                    "label": "Clientes",
+                    "path": "/customers",
+                    "roles": ["ADMIN"]
+                },
+                {
+                    "Icon": BriefcaseBusiness,
+                    "label": "Projetos",
+                    "path": "/projects",
+                    "roles": ["ADMIN"]
+                }
+            ]
+        },
+        {
+            "title": "Ações",
+            "items": [
+                {
+                    "Icon": ThumbsUp,
+                    "label": "Aprovação",
+                    "path": "/approval",
+                    "roles": ["ADMIN", "APPROVER"]
+                },
+                {
+                    "Icon": Landmark,
+                    "label": "Financeiro",
+                    "path": "/financial",
+                    "roles": ["ADMIN", "FINANCE"]
+                }
+            ]
+        }
+    ]
 }
 
 function SidebarItem({ Icon, label, active, onClick }: SidebarProps) {
@@ -43,6 +135,9 @@ function SidebarItem({ Icon, label, active, onClick }: SidebarProps) {
 }
 
 export default function Sidebar() {
+    const [role, setRole] = useState('')
+
+    const { user, logout } = useAuth()
     const {activeItem, setActiveItem} = useActiveItem();
     const navigate = useNavigate()
 
@@ -51,12 +146,23 @@ export default function Sidebar() {
         navigate(path)
     }
 
+    useEffect(() => {
+        async function getUserRole() {
+            const { data } = await api.get('/auth/getRole');
+            const rolePayload = data.payload;
+
+            setRole(rolePayload);
+        }
+
+        getUserRole()
+    })
+
     return (
-        <div className="w-64 bg-zinc-800 p-4">
+        <div className="w-64 bg-zinc-800 p-4 h-screen">
             <div className="flex items-center gap-2 px-2 py-4 text-red-400">
                 <span className="text-2xl font-bold">Reembox</span>
             </div>
-            <nav className="">
+            <nav className="relative h-[95%]">
                 <SidebarItem
                     Icon={Home}
                     label="Início"
@@ -64,80 +170,65 @@ export default function Sidebar() {
                     onClick={() => handleItemClick("Início", "/home")}
                 />
                 <Separator className="my-2 bg-zinc-700" />
-                <p className="flex h-8 shrink-0 items-center text-xs font-medium text-sidebar-foreground/70">Reembolsos</p>
-                <SidebarItem
-                    Icon={Receipt}
-                    label="Despesas"
-                    active={activeItem === "Despesas"}
-                    onClick={() => handleItemClick("Despesas", "/expenses")}
-                />
-                <SidebarItem
-                    Icon={FileText}
-                    label="Relatórios"
-                    active={activeItem === "Relatórios"}
-                    onClick={() => handleItemClick("Relatórios", "/reports")}
-                />
-                <p className="flex h-8 shrink-0 items-center text-xs font-medium text-sidebar-foreground/70">Estrutura Organizacional</p>
-                <SidebarItem
-                    Icon={Users}
-                    label="Colaboradores"
-                    active={activeItem === "Colaboradores"}
-                    onClick={() => handleItemClick("Colaboradores", "/collaborators")}
-                />
-                <SidebarItem
-                    Icon={Building}
-                    label="Cargos"
-                    active={activeItem === "Cargos"}
-                    onClick={() => handleItemClick("Cargos", "/job-titles")}
-                />
 
-                <SidebarItem
-                    Icon={Split}
-                    label="Centro de Custos"
-                    active={activeItem === "Centro de Custos"}
-                    onClick={() => handleItemClick("Centro de Custos", "/cost-centers")}
-                />
-                <SidebarItem
-                    Icon={Tag}
-                    label="Tipo de Despesas"
-                    active={activeItem === "Tipo de Despesas"}
-                    onClick={() => handleItemClick("Tipo de Despesas", "/expense-categories")}
-                />
-                <p className="flex h-8 shrink-0 items-center px-2 text-xs font-medium text-sidebar-foreground/70">Relacionamentos</p>
-                <SidebarItem
-                    Icon={Handshake}
-                    label="Clientes"
-                    active={activeItem === "Clientes"}
-                    onClick={() => handleItemClick("Clientes", "/customers")}
-                />
-                <SidebarItem
-                    Icon={BriefcaseBusiness}
-                    label="Projetos"
-                    active={activeItem === "Projetos"}
-                    onClick={() => handleItemClick("Projetos", "/projects")}
-                />
+                {
+                    sideBarItems["sections"].map((section: any, index: number) => {
+                        const sidebar = []
 
-                <p className="flex h-8 shrink-0 items-center px-2 text-xs font-medium text-sidebar-foreground/70">Ações</p>
-                <SidebarItem
-                    Icon={ThumbsUp}
-                    label="Aprovação"
-                    active={activeItem === "Aprovação"}
-                    onClick={() => handleItemClick("Aprovação", "/approval")}
-                />
-                <SidebarItem
-                    Icon={Landmark}
-                    label="Financeiro"
-                    active={activeItem === "Financeiro"}
-                    onClick={() => handleItemClick("Financeiro", "/financial")}
-                />
+                        section.items.forEach((item: any, index: number) => {
+                            
+                            if(item.roles.includes(role) || item.roles.length === 0) {
+                                sidebar.push(
+                                    <SidebarItem
+                                    key={index + 120}
+                                    Icon={item.Icon}
+                                    label={item.label}
+                                    active={activeItem === item.label}
+                                    onClick={() => handleItemClick(item.label, item.path)}
+                                    />)
+                            }
+                            
+                        })
 
-                <Separator className="mt-6 mb-3 bg-zinc-700" />
-                <SidebarItem
-                    Icon={Settings}
-                    label="Configurações"
-                    active={activeItem === "Configurações"}
-                    onClick={() => handleItemClick("Configurações", "/config")}
-                />
+                        if(sidebar.length !== 0) {
+                            sidebar.unshift(<p key={index + 90} className="flex h-8 shrink-0 items-center text-xs font-medium text-sidebar-foreground/70">{section.title}</p>)
+                        }
+
+                        return sidebar
+                    })
+                }
+
+                <div className="absolute bottom-0 w-full">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                        <Button className="h-16 hover:bg-zinc-700 flex gap-x-5" variant={"ghost"}>
+                            <img src={`https://ui-avatars.com/api/?name=${user && user.name}&background=random&rounded=true&size=40`} alt=""/>
+                            <div className="flex flex-col text-left w-fit">
+                                <span className="text-sm">{user && user.name}</span>
+                                <span className="shrink-0 text-xs font-medium text-sidebar-foreground/70">{user && user.username}</span>
+                            </div>
+                            <ChevronsUpDown  />
+                        </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                        side="top"
+                        className="w-[--radix-popper-anchor-width] flex flex-col gap-y-2"
+                        >
+                        <DropdownMenuItem onClick={() => {navigate('/my-account')}} className="cursor-pointer h-10">
+                            <span className="flex gap-x-3 items-center"><CircleUser size={16} />Minha Conta</span>
+                        </DropdownMenuItem>
+                        <Separator className="bg-zinc-700" />
+                        <DropdownMenuItem onClick={() => {navigate('/config')}} className="cursor-pointer h-10">
+                            <span className="flex gap-x-3 items-center"><Settings size={16} />Configurações</span>
+                        </DropdownMenuItem>
+                        <Separator className="bg-zinc-700" />
+                        <DropdownMenuItem onClick={logout} className="cursor-pointer h-10">
+                            <span className="flex gap-x-3 items-center"><LogOut size={16} />Sair</span>
+                        </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+
             </nav>
         </div>
     )
