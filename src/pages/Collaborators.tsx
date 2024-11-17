@@ -1,23 +1,7 @@
 import * as React from "react"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  // DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuCheckboxItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { 
-  Search, 
-  // Bell,
-  // ChevronDown,
-  Filter
-} from "lucide-react"
 import TableComponent from "@/components/custom_components/TableComponent"
 import { Collaborator } from "@/types/models.type"
+import ActionsBar from "@/components/custom_components/ActionsBar"
 // import Header from "@/components/custom_components/Header.tsx";
 // import Sidebar from "@/components/custom_components/Sidebar"
 
@@ -74,102 +58,14 @@ const collaborators: Collaborator[] = [
 ]
 
 export function Collaborators() {
-  const [filterOptions, setFilterOptions] = React.useState({
-    active: false,
-    inactive: false,
-    withAddress: false,
-    withoutAddress: false,
-  })
-  const [searchTerm, setSearchTerm] = React.useState("")
   const [filteredCollaborators, setFilteredCollaborators] = React.useState<Collaborator[]>(collaborators)
 
-  React.useEffect(() => {
-    const results = collaborators.filter(collaborator => {
-      const matchesSearch = Object.values(collaborator).some(value =>
-        typeof value === 'string' && value.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-      
-      const matchesFilter = (
-        (!filterOptions.active && !filterOptions.inactive) ||
-        (filterOptions.active && collaborator.status === "Ativo") ||
-        (filterOptions.inactive && collaborator.status === "Inativo")
-      ) && (
-        (!filterOptions.withAddress && !filterOptions.withoutAddress) ||
-        (filterOptions.withAddress && collaborator.address !== "Não cadastrado") ||
-        (filterOptions.withoutAddress && collaborator.address === "Não cadastrado")
-      )
-
-      return matchesSearch && matchesFilter
-    })
-    setFilteredCollaborators(results)
-  }, [searchTerm, filterOptions])
 
   return (
     <>
       <div className="flex-1 overflow-auto">
-        {/* Search and filter bar */}
-        <div className="flex items-center justify-between gap-4 border-b border-zinc-700 bg-zinc-800 p-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-zinc-400" />
-            <Input 
-              placeholder="Buscar..." 
-              className="pl-8 bg-zinc-700 border-zinc-600" 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="gap-2">
-                <Filter className="h-4 w-4" />
-                <span>Filtros</span>
-              </Button>
-            </DropdownMenuTrigger>
+      <ActionsBar />
 
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>Filtrar por</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuCheckboxItem
-                checked={filterOptions.active}
-                onCheckedChange={(checked) =>
-                  setFilterOptions((prev) => ({ ...prev, active: checked }))
-                }
-              >
-                Ativos
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={filterOptions.inactive}
-                onCheckedChange={(checked) =>
-                  setFilterOptions((prev) => ({ ...prev, inactive: checked }))
-                }
-              >
-                Inativos
-              </DropdownMenuCheckboxItem>
-
-              <DropdownMenuSeparator />
-              <DropdownMenuCheckboxItem
-                checked={filterOptions.withAddress}
-                onCheckedChange={(checked) =>
-                  setFilterOptions((prev) => ({ ...prev, withAddress: checked }))
-                }
-              >
-                Com endereço
-              </DropdownMenuCheckboxItem>
-
-              <DropdownMenuCheckboxItem
-                checked={filterOptions.withoutAddress}
-                onCheckedChange={(checked) =>
-                  setFilterOptions((prev) => ({ ...prev, withoutAddress: checked }))
-                }
-              >
-                Sem endereço
-              </DropdownMenuCheckboxItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-
-        {/* Table */}
         <div className="p-4">
           <TableComponent data={filteredCollaborators} columnHeaders={['Nome', 'Status', 'CPF', 'Endereço', 'Email']} />
         </div>

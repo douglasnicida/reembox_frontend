@@ -6,6 +6,10 @@
   list-style: none;
 }
 
+body {
+  overflow-y: hidden;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

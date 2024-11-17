@@ -1,11 +1,4 @@
 import * as React from "react";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Search, Filter } from "lucide-react";
 import TableComponent from "@/components/custom_components/TableComponent";
 import { CostCenter } from "@/types/models.type";
 import { Toaster } from "@/components/ui/toaster";
@@ -14,9 +7,13 @@ import { errorHandler } from "@/utils/errorHandler";
 import { Pagination } from "@/components/custom_components/Pagination";
 import api from "@/api/axios";
 import { Paginated } from "@/types/response.type";
+import ActionsBar from "@/components/custom_components/ActionsBar";
+import { useActiveItem } from "@/context/ActiveItemContext";
 
 export default function CostCenterPage() {
-  const [searchTerm, setSearchTerm] = React.useState("");
+
+  const { reload } = useActiveItem()
+  
   const [data, setData] = React.useState<Paginated<CostCenter>>({
     payload: {
       items: [],
@@ -35,9 +32,6 @@ export default function CostCenterPage() {
           size,
         },
       });
-
-      console.log(response.data);
-      
       
       setData(response.data);
     } catch (err: any) {
@@ -47,53 +41,12 @@ export default function CostCenterPage() {
 
   React.useEffect(() => {
     fetchCostCenters(1);
-  }, []);
+  }, [reload]);
 
   return (
     <>
       <div className="flex-1 overflow-auto">
-        <div className="flex items-center justify-between gap-4 border-b border-zinc-700 bg-zinc-800 p-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-zinc-400" />
-            <Input 
-              placeholder="Buscar..." 
-              className="pl-8 bg-zinc-700 border-zinc-600" 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="gap-2">
-                <Filter className="h-4 w-4" />
-                <span>Filtros</span>
-              </Button>
-            </DropdownMenuTrigger>
-
-            {/* <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>Filtrar por</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuCheckboxItem
-                checked={}
-                onCheckedChange={(checked) =>
-                  setFilterOptions((prev) => ({ ...prev, active: checked }))
-                }
-              >
-                Ativos
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={filterOptions.inactive}
-                onCheckedChange={(checked) =>
-                  setFilterOptions((prev) => ({ ...prev, inactive: checked }))
-                }
-              >
-                Inativos
-              </DropdownMenuCheckboxItem>
-            </DropdownMenuContent> */}
-          </DropdownMenu>
-        </div>
-
+        <ActionsBar />
         <div className="p-4">
           <TableComponent 
             data={data ? data.payload.items : []} // Acesse os itens corretamente

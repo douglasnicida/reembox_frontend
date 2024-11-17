@@ -27,7 +27,7 @@ export function Pagination<T>({ data, onPageChange }: PaginationProps<T>) {
   };
 
   return (
-    <UiPagination>
+    <UiPagination className="mr-2">
       <PaginationContent>
         <PaginationItem>
           <PaginationPrevious

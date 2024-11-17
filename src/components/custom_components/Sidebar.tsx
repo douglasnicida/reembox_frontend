@@ -198,7 +198,7 @@ export default function Sidebar() {
                     })
                 }
 
-                <div className="absolute bottom-0 w-full">
+                <div className="absolute bottom-3 w-full">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                         <Button className="h-16 hover:bg-zinc-700 flex gap-x-5" variant={"ghost"}>
