@@ -31,7 +31,7 @@ export function Pagination<T>({ data, onPageChange }: PaginationProps<T>) {
     <span className="text-sm font-medium text-sidebar-foreground/70">
       Foram encontrados {data.totalItems} registros
     </span>
-    <UiPagination>
+    <UiPagination className="mr-2">
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious

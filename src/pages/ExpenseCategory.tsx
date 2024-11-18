@@ -16,6 +16,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { errorHandler } from "@/utils/errorHandler";
 import api from "@/api/axios";
 import { Paginated, PaginatedResponse } from "@/types/response.type";
+import CreationDialog from "@/components/custom_components/CreationDialog";
+import { dtoList } from "@/lib/utils";
+import { useActiveItem } from "@/context/ActiveItemContext";
 
 export default function ExpenseCategoryPage() {
   const [q, setQ] = useState("");
@@ -27,6 +30,7 @@ export default function ExpenseCategoryPage() {
     currentPage: 1,
     size: 10,
   });
+  const { activeItem } = useActiveItem();
 
   async function fetchExpenseCategories(page: number, size: number = 10) {
     try {
@@ -78,6 +82,7 @@ export default function ExpenseCategoryPage() {
                 }}
               />
             </div>
+            <CreationDialog dtoList={dtoList.dtos} currentLabel={activeItem} />
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

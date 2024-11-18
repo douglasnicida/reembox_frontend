@@ -158,7 +158,7 @@ export default function Sidebar() {
     }, []);
 
     return (
-        <div className="w-64 bg-zinc-800 p-4 h-screen flex flex-col border-r border-zinc-700">
+        <div className="w-64 bg-zinc-800 p-4 h-full flex flex-col border-r border-zinc-700">
             {/* Cabeçalho da Sidebar */}
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -169,7 +169,7 @@ export default function Sidebar() {
                             </div>
                             <div className="flex flex-col">
                                 <span className="text-2xl font-bold text-red-400">Reembox</span>
-                                <span className="shrink-0 text-md font-medium text-sidebar-foreground/60">{user && user.company || "Empresa X"}</span>
+                                <span className="shrink-0 text-md font-medium text-sidebar-foreground/60">{user && user.company}</span>
                             </div>
                         </div>
                     </div>
@@ -177,7 +177,7 @@ export default function Sidebar() {
             </DropdownMenu>
 
             {/* Navegação */}
-            <nav className="flex-grow overflow-y-auto mt-4">
+            <nav className="flex-grow h-full overflow-y-auto mt-4">
                 <SidebarItem Icon={Home} label="Início" active={activeItem === "Início"} onClick={() => handleItemClick("Início", "/home")} />
                 <Separator className="my-2 bg-zinc-700" />
                 {sideBarItems["sections"].map((section: any, index: number) => {
@@ -199,7 +199,7 @@ export default function Sidebar() {
             </nav>
 
             {/* Dropdown Menu no final da Sidebar */}
-            <div className="mt-auto">
+            <div className="mt-[100%]">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button className="h-16 hover:bg-zinc-700 flex gap-x-5" variant={"ghost"}>

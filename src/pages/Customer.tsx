@@ -17,6 +17,9 @@ import { errorHandler } from "@/utils/errorHandler";
 
 import api from "@/api/axios";
 import { Paginated, PaginatedResponse } from "@/types/response.type";
+import CreationDialog from "@/components/custom_components/CreationDialog";
+import { dtoList } from "@/lib/utils";
+import { useActiveItem } from "@/context/ActiveItemContext";
 
 export default function CustomerPage() {
   const [q, setQ] = useState<string>("");
@@ -28,6 +31,7 @@ export default function CustomerPage() {
     currentPage: 1,
     size: 10,
   });
+  const { activeItem } = useActiveItem();
 
   async function fetchCustomers(page: number, size: number = 10) {
     try {
@@ -79,6 +83,7 @@ export default function CustomerPage() {
                 }}
               />
             </div>
+            <CreationDialog dtoList={dtoList.dtos} currentLabel={activeItem} />
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

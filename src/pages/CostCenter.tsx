@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import * as React from "react";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -16,12 +16,17 @@ import { Toaster } from "@/components/ui/toaster";
 import { errorHandler } from "@/utils/errorHandler";
 
 import api from "@/api/axios";
+import { useActiveItem } from "@/context/ActiveItemContext";
 import { Paginated, PaginatedResponse } from "@/types/response.type";
+import CreationDialog from "@/components/custom_components/CreationDialog";
+import { dtoList } from "@/lib/utils";
 
 export default function CostCenterPage() {
-    const [q, setQ] = useState<string>("");
-    const [active, setActive] = useState<boolean | undefined>(undefined);
-    const [data, setData] = useState<Paginated<CostCenter>>({
+    const { reload, activeItem } = useActiveItem()
+
+    const [q, setQ] = React.useState<string>("");
+    const [active, setActive] = React.useState<boolean | undefined>(undefined);
+    const [data, setData] = React.useState<Paginated<CostCenter>>({
         items: [],
         totalItems: 0,
         totalPages: 0,
@@ -48,9 +53,9 @@ export default function CostCenterPage() {
         }
     }
 
-    useEffect(() => {
+    React.useEffect(() => {
         fetchCostCenters(1);
-    }, [active]);
+    }, [reload, active]);
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -77,6 +82,8 @@ export default function CostCenterPage() {
                                 }}
                             />
                         </div>
+                        <CreationDialog dtoList={dtoList.dtos} currentLabel={activeItem} />
+
 
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>

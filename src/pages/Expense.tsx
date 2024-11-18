@@ -1,11 +1,7 @@
 import * as React from "react";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Filter } from "lucide-react";
+import { Search } from "lucide-react";
 import TableComponent from "@/components/custom_components/TableComponent";
 import { Expense, ExpenseTableItem } from "@/types/models.type";
 import { Toaster } from "@/components/ui/toaster";
@@ -13,9 +9,10 @@ import { errorHandler } from "@/utils/errorHandler";
 
 import api from "@/api/axios";
 import { Paginated, PaginatedResponse } from "@/types/response.type";
+import { useNavigate } from "react-router-dom";
 
 export default function ExpensePage() {
-  const [searchTerm, setSearchTerm] = React.useState("");
+  const [q, setQ] = React.useState("");
   const [data, setData] = React.useState<Paginated<ExpenseTableItem>>({
     items: [],
     totalItems: 0,
@@ -23,6 +20,8 @@ export default function ExpensePage() {
     currentPage: 1,
     size: 10,
   });
+
+  const navigate = useNavigate()
 
   async function fetchExpenses(page: number, size: number = 10) {
     try {
@@ -62,40 +61,11 @@ export default function ExpensePage() {
             <Input 
               placeholder="Buscar..." 
               className="pl-8 bg-zinc-700 border-zinc-600" 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
             />
           </div>
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="gap-2">
-                <Filter className="h-4 w-4" />
-                <span>Filtros</span>
-              </Button>
-            </DropdownMenuTrigger>
-
-            {/* <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>Filtrar por</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuCheckboxItem
-                checked={}
-                onCheckedChange={(checked) =>
-                  setFilterOptions((prev) => ({ ...prev, active: checked }))
-                }
-              >
-                Ativos
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={filterOptions.inactive}
-                onCheckedChange={(checked) =>
-                  setFilterOptions((prev) => ({ ...prev, inactive: checked }))
-                }
-              >
-                Inativos
-              </DropdownMenuCheckboxItem>
-            </DropdownMenuContent> */}
-          </DropdownMenu>
+          <Button variant="default" className="text-sm font-bold" onClick={() => navigate("/expense/new")}>Criar +</Button>
         </div>
 
         <div className="p-4">

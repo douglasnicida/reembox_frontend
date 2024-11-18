@@ -38,7 +38,7 @@ function UploadInput({ onChange }: UploadInputProps) {
           <img
             src={URL.createObjectURL(file)}
             alt={`Preview ${index}`}
-            className="w-  h-32 object-cover rounded-md"
+            className="w-32 h-32 object-cover rounded-md"
           />
           <p
             className="text-xs text-zinc-400 mt-1 text-center truncate w-32"

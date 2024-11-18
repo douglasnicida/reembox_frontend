@@ -21,13 +21,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { Paginated, PaginatedResponse } from "@/types/response.type"
 
 export default function CollaboratorPage() {
-  const [filterOptions, setFilterOptions] = React.useState({
-    active: false,
-    inactive: false,
-    withAddress: false,
-    withoutAddress: false,
-  })
-  const [searchTerm, setSearchTerm] = React.useState("")
+  const [q, setQ] = React.useState("")
 
   const [data, setData] = React.useState<Paginated<Collaborator>>({
     items: [],
@@ -58,15 +52,14 @@ export default function CollaboratorPage() {
 
   return (
     <>
-      {/* Search and filter bar */}
       <div className="flex items-center justify-between gap-4 border-b border-zinc-700 bg-zinc-800 p-4">
         <div className="relative flex-1">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-zinc-400" />
           <Input 
             placeholder="Buscar..." 
             className="pl-8 bg-zinc-700 border-zinc-600" 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
           />
         </div>
         

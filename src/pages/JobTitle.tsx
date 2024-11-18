@@ -13,6 +13,9 @@ import { errorHandler } from "@/utils/errorHandler";
 
 import api from "@/api/axios";
 import { Paginated, PaginatedResponse } from "@/types/response.type";
+import CreationDialog from "@/components/custom_components/CreationDialog";
+import { dtoList } from "@/lib/utils";
+import { useActiveItem } from "@/context/ActiveItemContext";
 
 export default function JobTitlePage() {
   const [q, setQ] = React.useState(""); 
@@ -23,6 +26,7 @@ export default function JobTitlePage() {
     currentPage: 1,
     size: 10,
   });
+  const { activeItem } = useActiveItem();
 
   async function fetchJobTitles(page: number, size: number = 10) {
     try {
@@ -71,6 +75,7 @@ export default function JobTitlePage() {
               />
             </div>
           </div>
+          <CreationDialog dtoList={dtoList.dtos} currentLabel={activeItem} />
         </form>
 
         <div className="p-4">

@@ -30,7 +30,7 @@ export default function AppRoute() {
     }, [navigate, setActiveItem])
 
     return (
-        <div className="dark flex h-screen bg-zinc-900 text-zinc-100">
+        <div className="dark flex h-full bg-zinc-900 text-zinc-100">
             { activeItem != 'Login' && <Sidebar/> }
             <div className="flex flex-col w-full">
                 { activeItem != 'Login' && activeItem.length > 0 && <Header/> }
