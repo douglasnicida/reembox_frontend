@@ -20,6 +20,7 @@ const RoutesMap: Record<string, string> = {
     "/financial": "Financeiro",
     "/approval": "Aprovação",
     "/config": "Configurações",
+    '/expense/new': "Nova despesa"
 }
 
 const ActiveItemContext = createContext<ActiveItemContextType | undefined>(undefined);
@@ -33,8 +34,6 @@ export const useActiveItem = () => {
 };
 
 export const ActiveItemProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-
-    // TODO: implementar AuthContext para funcionar corretamente
     const token = 'a';
 
     useEffect(() => {

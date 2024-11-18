@@ -16,7 +16,7 @@ type PaginationProps<T> = {
 };
 
 export function Pagination<T>({ data, onPageChange }: PaginationProps<T>) {
-  const { totalPages, currentPage } = data.payload;
+  const { totalPages, currentPage } = data;
   const [activePage, setActivePage] = useState(currentPage);
 
   const handlePageChange = (page: number) => {
@@ -27,33 +27,38 @@ export function Pagination<T>({ data, onPageChange }: PaginationProps<T>) {
   };
 
   return (
+    <div className="flex items-center justify-between">
+    <span className="text-sm font-medium text-sidebar-foreground/70">
+      Foram encontrados {data.totalItems} registros
+    </span>
     <UiPagination>
-      <PaginationContent>
-        <PaginationItem>
-          <PaginationPrevious
-            href="#"
-            onClick={() => handlePageChange(activePage - 1)}
-          />
-        </PaginationItem>
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-          <PaginationItem key={page}>
-            <PaginationLink
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
               href="#"
-              isActive={page === activePage}
-              onClick={() => handlePageChange(page)}
-            >
-              {page}
-            </PaginationLink>
+              onClick={() => handlePageChange(activePage - 1)}
+            />
           </PaginationItem>
-        ))}
-        {totalPages > 5 && <PaginationEllipsis />}
-        <PaginationItem>
-          <PaginationNext
-            href="#"
-            onClick={() => handlePageChange(activePage + 1)}
-          />
-        </PaginationItem>
-      </PaginationContent>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <PaginationItem key={page}>
+              <PaginationLink
+                href="#"
+                isActive={page === activePage}
+                onClick={() => handlePageChange(page)}
+              >
+                {page}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+          {totalPages > 5 && <PaginationEllipsis />}
+          <PaginationItem>
+            <PaginationNext
+              href="#"
+              onClick={() => handlePageChange(activePage + 1)}
+            />
+          </PaginationItem>
+        </PaginationContent>
     </UiPagination>
+    </div>
   );
 }

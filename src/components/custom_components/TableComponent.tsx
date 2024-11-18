@@ -1,80 +1,109 @@
-import { MoreVertical } from "lucide-react";
-import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { Table, TableHeader, TableRow, TableBody, TableCell, TableHead } from "../ui/table";
+import { Pagination } from "./Pagination";
+import { Paginated } from "@/types/response.type";
+import EmptyTable from "./EmptyTable";
+import { Switch } from "../ui/switch";
+import axios from "@/api/axios";
+import { errorHandler } from "@/utils/errorHandler";
+import React from "react";
+import { MoreVertical } from "lucide-react";
 import { handleFormatDate } from "@/utils/handleDate";
 
 export interface TableProps<T> {
-  data: T[];
+  resource?: string;
+  data: Paginated<T>
   columnHeaders: string[];
+  onPageChange: (page: number) => void;
 }
 
-export default function TableComponent<T extends Record<string, any>>({data, columnHeaders}: TableProps<T>) {
-  
-  const GenerateTableCell = (item: T) => 
-    Object.entries(item).map(([key, value]) => {
-      let displayValue = String(value);
+export default function TableComponent<T extends Record<string, any>>(
+  { resource, data, columnHeaders, onPageChange }: TableProps<T>
+) {
+  const [items, setItems] = React.useState(data.items);
 
-      if (typeof value === "string" || value instanceof Date) {
-        displayValue = handleFormatDate(value);
-      }
+  React.useEffect(() => {
+    setItems(data.items);
+  }, [data.items]);
 
-      if (key === "active") {
-        return (
-          <TableCell key={key}>
-            <Badge 
-              variant="outline" 
-              className={displayValue
-                ? "bg-green-400/15 text-green-400 border-green-400"
-                : "bg-zinc-500/15 text-red-400 border-red-400"
-              }
-            >
-              {displayValue ? "Ativo" : "Inativo"}
-            </Badge>
-          </TableCell>
-        );
-      } else if (key === "name") {
-        return <TableCell key={key} className="font-bold">{displayValue}</TableCell>;
-      } else {
-        return <TableCell key={key}>{displayValue}</TableCell>;
-      }
-    });
+  const handleToggle = async (id: number, active: boolean) => {
+    try {
+      await axios.delete(`${resource}/${id}`);
   
+      // Atualiza localmente o estado
+      setItems((prevItems) =>
+        prevItems.map((item) =>
+          item.id === id ? { ...item, active } : item
+        )
+      );
+    } catch (err: any) {
+      errorHandler(err);
+    }
+  };
+
+  // Gera as células da tabela
+  const GenerateTableCell = (item: T) =>
+    Object.entries(item)
+      .map(([key, value]) => {
+        if (key === "id") return null;
+
+        if (key === "active") {
+          return (
+            <TableCell key={key}>
+              <Switch
+                checked={value}
+                onCheckedChange={async (checked) => {
+                  await handleToggle(item.id, checked);
+                }}
+              />
+            </TableCell>
+          );
+        } 
+        
+        value = handleFormatDate(value)
+        return <TableCell key={key}>{value}</TableCell>;
+      })
+      .filter((cell) => cell !== null);
+
   return (
+    <>
+      {items.length > 0 ? (
         <Table className="rounded-md">
-            <TableHeader className="bg-zinc-800">
-              <TableRow>
-                {
-                    columnHeaders.map((header, index) => (
-                        <TableHead key={index}>{header}</TableHead>
-                    ))
-                }
-                <TableHead className="w-[50px]"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data.map((item : T, index: number) => (
-                <TableRow key={index} className="hover:bg-zinc-800">
-
-                  {GenerateTableCell(item)}
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreVertical className="h-4 w-4" />
-                          <span className="sr-only">Abrir menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>Editar</DropdownMenuItem>
-                        <DropdownMenuItem>Excluir</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
+          <TableHeader className="bg-zinc-800">
+            <TableRow>
+              {columnHeaders.map((header, index) => (
+                <TableHead key={index}>{header}</TableHead>
               ))}
-            </TableBody>
-          </Table>
-    )
+              <TableHead className="w-[50px]"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {items.map((item, index) => (
+              <TableRow key={index} className="hover:bg-zinc-800">
+                {GenerateTableCell(item)}
+                <TableCell>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <MoreVertical className="h-4 w-4" />
+                        <span className="sr-only">Abrir menu</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem>Editar</DropdownMenuItem>
+                      <DropdownMenuItem>Excluir</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      ) : (
+        <EmptyTable />
+      )}
+      {data.totalPages > 1 && <Pagination data={data} onPageChange={onPageChange} />}
+    </>
+  );
 }

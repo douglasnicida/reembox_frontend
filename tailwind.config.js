@@ -63,9 +63,9 @@ module.exports = {
   				border: 'hsl(var(--sidebar-border))',
   				ring: 'hsl(var(--sidebar-ring))'
   			},
-				cu: {
-					red: '#ffffff',
-				}
+  			cu: {
+  				red: '#ffffff'
+  			}
   		},
   		borderRadius: {
   			lg: 'var(--radius)',

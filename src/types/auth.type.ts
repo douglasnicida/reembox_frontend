@@ -1,6 +1,7 @@
 type TokenType = {
     username: string;
     name: string;
+    company: string;
 }
 
 type LoginType = {

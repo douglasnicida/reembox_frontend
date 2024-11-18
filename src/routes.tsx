@@ -1,6 +1,5 @@
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import App from './App';
-import { Collaborators } from './pages/Collaborators';
 import Sidebar from "@/components/custom_components/Sidebar.tsx";
 import Header from "@/components/custom_components/Header.tsx";
 import LoginPage from './pages/Login';
@@ -8,6 +7,13 @@ import ReportsPage from "@/pages/Reports.tsx";
 import { useActiveItem } from './context/ActiveItemContext';
 import CostCenterPage from './pages/CostCenter';
 import { useEffect } from 'react';
+import ExpenseCategoryPage from './pages/ExpenseCategory';
+import CustomerPage from './pages/Customer';
+import JobTitlePage from './pages/JobTitle';
+import CollaboratorPage from './pages/Collaborator';
+import ProjectPage from './pages/Project';
+import ExpensePage from './pages/Expense';
+import CreateExpensePage from './pages/CreateExpense';
 
 export default function AppRoute() {
     const { activeItem, setActiveItem } = useActiveItem();
@@ -33,15 +39,17 @@ export default function AppRoute() {
                         <Route path="/" element={<LoginPage/>}/>
                         <Route path="/home" element={<App />}/>
                         <Route path="/reports" element={<ReportsPage/>}/>
-                        <Route path="/expenses" element={<App/>}/>
-                        <Route path="/collaborators" element={<Collaborators/>}/>
-                        <Route path="/job-titles" element={<App/>}/>
+                        <Route path="/expenses" element={<ExpensePage/>}/>
+                        <Route path="/collaborators" element={<CollaboratorPage/>}/>
+                        <Route path="/job-titles" element={<JobTitlePage/>}/>
                         <Route path="/cost-centers" element={<CostCenterPage/>}/>
-                        <Route path="/expense-categories" element={<CostCenterPage/>}/>
-                        <Route path="/projects" element={<App/>}/>
-                        <Route path="/customers" element={<App/>}/>
+                        <Route path="/expense-categories" element={<ExpenseCategoryPage/>}/>
+                        <Route path="/projects" element={<ProjectPage/>}/>
+                        <Route path="/customers" element={<CustomerPage/>}/>
                         <Route path="/financial" element={<App/>}/>
                         <Route path="/approval" element={<App/>}/>
+
+                        <Route path="/expense/new" element={<CreateExpensePage/>}/>
                     </Routes>
                 </div>
             </div>
