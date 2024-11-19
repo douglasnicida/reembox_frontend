@@ -85,7 +85,7 @@ export default function CreateExpensePage() {
       const { images, ...rest } = expense
       const formData = new FormData()
 
-      for (let receipt of expense.images) {
+      for (const receipt of expense.images) {
         formData.append('receipts', receipt)
       }
 
@@ -121,13 +121,14 @@ export default function CreateExpensePage() {
   }
 
   return (
-    <div className="flex flex-col bg-zinc-900">
-      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+    <div className="flex flex-col bg-zinc-900 overflow-y-scroll h-[calc(100vh-48px)]">
+      <div className="flex-1 space-y-4 p-4 md:p-5 pt-6">
         <div className="grid gap-4 grid-cols-1">
           <div className="space-y-4">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 bg-zinc-800 rounded-lg p-4">
                 <p className="text-sm text-zinc-400 mb-4">Campos marcados com <span className="text-red-500">*</span> são obrigatórios</p>
+                {/* Data da despesa */}
                 <FormField
                   control={form.control}
                   name="expenseDate"
@@ -170,6 +171,7 @@ export default function CreateExpensePage() {
                   )}
                 />
 
+                {/* Comprovante de Pagamento */}
                 <FormField
                   control={form.control}
                   name="images"
@@ -189,6 +191,8 @@ export default function CreateExpensePage() {
                 />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                {/* Valor */}
                 <FormField
                   control={form.control}
                   name="value"
@@ -212,6 +216,7 @@ export default function CreateExpensePage() {
                   )}
                 />
 
+                {/* Quantidade */}
                 <FormField
                   control={form.control}
                   name="quantity"
@@ -232,6 +237,7 @@ export default function CreateExpensePage() {
                 />
                 </div>
 
+                {/* Notas */}
                 <FormField
                   control={form.control}
                   name="notes"
@@ -250,6 +256,7 @@ export default function CreateExpensePage() {
                 />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Relatório */}
                   <FormField
                     control={form.control}
                     name="reportCode"
@@ -279,6 +286,7 @@ export default function CreateExpensePage() {
                     )}
                   />
 
+                  {/* Centro de Custo */}
                   <FormField
                     control={form.control}
                     name="costCenterId"
@@ -313,6 +321,7 @@ export default function CreateExpensePage() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Projeto */}
                   <FormField
                     control={form.control}
                     name="projectId"
@@ -345,6 +354,7 @@ export default function CreateExpensePage() {
                     )}
                   />
 
+                  {/* Categoria */}
                   <FormField
                     control={form.control}
                     name="categoryId"

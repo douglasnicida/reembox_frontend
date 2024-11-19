@@ -34,7 +34,7 @@ export default function AppRoute() {
             { activeItem != 'Login' && <Sidebar/> }
             <div className="flex flex-col w-full">
                 { activeItem != 'Login' && activeItem.length > 0 && <Header/> }
-                <div className="flex-grow">
+                <div className="flex-grow overflow-y-hidden h-[calc(100%-300px)]">
                     <Routes>
                         <Route path="/" element={<LoginPage/>}/>
                         <Route path="/home" element={<App />}/>

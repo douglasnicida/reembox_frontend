@@ -177,7 +177,7 @@ export default function Sidebar() {
             </DropdownMenu>
 
             {/* Navegação */}
-            <nav className="flex-grow h-full overflow-y-auto mt-4">
+            <nav className="flex-grow h-screen overflow-y-auto mt-4">
                 <SidebarItem Icon={Home} label="Início" active={activeItem === "Início"} onClick={() => handleItemClick("Início", "/home")} />
                 <Separator className="my-2 bg-zinc-700" />
                 {sideBarItems["sections"].map((section: any, index: number) => {
@@ -199,7 +199,7 @@ export default function Sidebar() {
             </nav>
 
             {/* Dropdown Menu no final da Sidebar */}
-            <div className="mt-[100%]">
+            <div className="absolute bottom-2 left-0">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button className="h-16 hover:bg-zinc-700 flex gap-x-5" variant={"ghost"}>
