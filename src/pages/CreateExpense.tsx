@@ -43,11 +43,12 @@ import { toast } from "@/hooks/use-toast"
 import { useNavigate } from "react-router-dom"
 
 export default function CreateExpensePage() {
-  const [costCenters, setCostCenters] = useState<ExpenseParam[]>([])
-  const [projects, setProjects] = useState<ExpenseParam[]>([])
-  const [categories, setCategories] = useState<ExpenseParam[]>([])
-  const [reports, setReports] = useState<ExpenseParam[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [costCenters, setCostCenters] = useState<ExpenseParam[]>([]);
+  const [projects, setProjects] = useState<ExpenseParam[]>([]);
+  const [categories, setCategories] = useState<ExpenseParam[]>([]);
+  const [reports, setReports] = useState<ExpenseParam[]>([]);
+  const [receiptsURLs, setReceiptURLs] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const navigate = useNavigate()
 
@@ -60,6 +61,12 @@ export default function CreateExpensePage() {
       notes: "",
     },
   })
+
+  async function handleUploadFiles(file: File) {
+    const { data } = await api.post("/upload", file)
+
+    return data;
+  }
 
   async function fetchParams() {
     try {
@@ -89,15 +96,31 @@ export default function CreateExpensePage() {
         formData.append('receipts', receipt)
       }
 
+      // Ver como recupera os Files do FileList
+      images.forEach(async (file: File) => {
+        // Fazer o upload no endpoint de upload
+        const publicFileURL: string = await handleUploadFiles(file);
+        
+        //salvar todas as URLs geradas dentro do State de ReceiptsURL
+        setReceiptURLs((prev) => [...prev, publicFileURL]);
+          
+      })
+
       console.log({
         ...rest,
         expenseDate: expense.expenseDate.toISOString()        
       });
-      
 
-      await api.post('expenses', {
+      const expenseID = await api.post('expenses', {
         ...rest,
         expenseDate: expense.expenseDate.toISOString()        
+      })
+
+      receiptsURLs.forEach(async (url: string) => {
+        await api.post('/receipts', {
+          url,
+          expenseId: expenseID
+        })
       })
 
       toast({

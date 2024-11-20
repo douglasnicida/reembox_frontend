@@ -1,99 +1,85 @@
-import {Filter, Search} from "lucide-react";
-import {Input} from "@/components/ui/input.tsx";
-import {
-    DropdownMenu, DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuLabel, DropdownMenuSeparator,
-    DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu.tsx";
-import { Button } from "@/components/ui/button.tsx";
-import TableComponent from "@/components/custom_components/TableComponent.tsx";
-import * as React from "react";
-import { Report } from "@/types/models.type.ts";
-import {useEffect} from "react";
-
+import api from "@/api/axios";
+import TableComponent from "@/components/custom_components/TableComponent";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Toaster } from "@/components/ui/toaster";
+import { Report, ReportTableItem } from "@/types/models.type";
+import { Paginated, PaginatedResponse } from "@/types/response.type";
+import { errorHandler } from "@/utils/errorHandler";
+import { Search } from "lucide-react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function ReportsPage() {
-    const [filterOptions, setFilterOptions] = React.useState({
-        active: false,
-        inactive: false,
-        withAddress: false,
-        withoutAddress: false,
-    })
-    const [searchTerm, setSearchTerm] = React.useState("")
-    const [filteredCollaborators, setFilteredCollaborators] = React.useState<Report[]>([{id: 1, goal: "teste de recibo"}])
-
-    useEffect(() => {
-        setFilteredCollaborators([{id: 1, goal: "teste de recibo"}]);
+    const [q, setQ] = React.useState("");
+    const [data, setData] = React.useState<Paginated<ReportTableItem>>({
+      items: [],
+      totalItems: 0,
+      totalPages: 0,
+      currentPage: 1,
+      size: 10,
+    });
+  
+    const navigate = useNavigate()
+  
+    async function fetchExpenses(page: number, size: number = 10) {
+      try {
+        const { data } = await api.get<PaginatedResponse<Report>>("/reports", {
+          params: {
+            page,
+            size,
+          },
+        });
+  
+        setData({
+          ...data.payload,
+          items: data.payload.items.map(report => ({
+            id: report.id,
+            key: report.id,
+            goal: report.goal,
+            name: report.name,
+            total: report.total,
+            creator: {name: report.creator.name},
+            approver: {name: report.approver.name},
+            status: report.status,
+            createdAt: report.createdAt,
+            updatedAt: report.updatedAt
+          }))
+        });
+      } catch (err: any) {
+        errorHandler(err);
+      }
+    }
+  
+    React.useEffect(() => {
+      fetchExpenses(1);
     }, []);
-
     return (
         <>
-        <div className="flex-1 overflow-auto">
-            {/* Search and filter bar */}
-            <div className="flex items-center justify-between gap-4 border-b border-zinc-700 bg-zinc-800 p-4">
-                <div className="relative flex-1">
-                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-zinc-400" />
-                    <Input
-                        placeholder="Buscar..."
-                        className="pl-8 bg-zinc-700 border-zinc-600"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="gap-2">
-                            <Filter className="h-4 w-4" />
-                            <span>Filtros</span>
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56">
-                        <DropdownMenuLabel>Filtrar por</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuCheckboxItem
-                            checked={filterOptions.active}
-                            onCheckedChange={(checked) =>
-                                setFilterOptions((prev) => ({ ...prev, active: checked }))
-                            }
-                        >
-                            Ativos
-                        </DropdownMenuCheckboxItem>
-                        <DropdownMenuCheckboxItem
-                            checked={filterOptions.inactive}
-                            onCheckedChange={(checked) =>
-                                setFilterOptions((prev) => ({ ...prev, inactive: checked }))
-                            }
-                        >
-                            Inativos
-                        </DropdownMenuCheckboxItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuCheckboxItem
-                            checked={filterOptions.withAddress}
-                            onCheckedChange={(checked) =>
-                                setFilterOptions((prev) => ({ ...prev, withAddress: checked }))
-                            }
-                        >
-                            Com endereço
-                        </DropdownMenuCheckboxItem>
-                        <DropdownMenuCheckboxItem
-                            checked={filterOptions.withoutAddress}
-                            onCheckedChange={(checked) =>
-                                setFilterOptions((prev) => ({ ...prev, withoutAddress: checked }))
-                            }
-                        >
-                            Sem endereço
-                        </DropdownMenuCheckboxItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </div>
-
-            {/* Table */}
-            <div className="p-4">
-                <TableComponent data={filteredCollaborators} columnHeaders={['Nome', 'Status', 'Objetivo']} />
-            </div>
-
+            <div className="flex-1 overflow-auto">
+        <div className="flex items-center justify-between gap-4 border-b border-zinc-700 bg-zinc-800 p-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-zinc-400" />
+            <Input 
+              placeholder="Buscar..." 
+              className="pl-8 bg-zinc-700 border-zinc-600" 
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+            />
+          </div>
+          <Button variant="default" className="text-sm font-bold" onClick={() => navigate("/expense/new")}>Criar +</Button>
         </div>
+
+        <div className="p-4">
+          <TableComponent 
+            resource="reports"
+            data={data}
+            columnHeaders={['Nome', 'Objetivo', 'Status', 'Criador', 'Aprovador', 'Total']}
+            onPageChange={fetchExpenses}
+          />
+        </div>
+      </div>
+      <Toaster />
         </>
     )
 }

@@ -1,3 +1,13 @@
+enum ReportStatus {
+    OPEN,
+    SUBMITTED,
+    REJECTED,
+    APPROVED,
+    PENDING_PROCESSING,
+    PROCESSING_ERROR,
+    PROCESSING_PAYMENT,
+  }
+
 export type Collaborator = {
     id: number;
     name: string;
@@ -20,8 +30,44 @@ export type Customer = {
 }
 
 export type Report = {
-    id?: number;
+    id: number;
+    code?: string;
     goal: string;
+    name: string;
+    total?: number;
+    dueDate?: string;
+    creator: {
+        name: string;
+    }
+    approver: {
+        name: string;
+    }
+    expenses: ReportExpense[]
+    createdAt: string;
+    updatedAt: string;
+    status: ReportStatus
+}
+
+export type ReportTableItem = {
+    id: number;
+    key: number;
+    goal: string;
+    name: string;
+    total?: number;
+    creator: {
+        name: string;
+    }
+    approver: {
+        name: string;
+    }
+    createdAt: string;
+    updatedAt: string;
+    status: ReportStatus
+}
+
+export type ReportExpense = {
+    expense: Expense;
+    report: Report;
 }
 
 export type CostCenter = {
