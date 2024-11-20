@@ -30,7 +30,7 @@ export default function ExpenseCategoryPage() {
     currentPage: 1,
     size: 10,
   });
-  const { activeItem } = useActiveItem();
+  const { activeItem, reload } = useActiveItem();
 
   async function fetchExpenseCategories(page: number, size: number = 10) {
     try {
@@ -55,7 +55,7 @@ export default function ExpenseCategoryPage() {
 
   useEffect(() => {
     fetchExpenseCategories(1);
-  }, [active]);
+  }, [active, reload]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

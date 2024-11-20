@@ -14,10 +14,10 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { useState } from "react"
+import { Dispatch, SetStateAction, useState } from "react"
 import { Loader2 } from 'lucide-react'
 
-import { Expense, ReportParams } from "@/types/models.type"
+import { Expense, ReportParam, ReportParams } from "@/types/models.type"
 import api from "@/api/axios"
 import { errorHandler } from "@/utils/errorHandler"
 import React from "react"
@@ -25,11 +25,67 @@ import { Response } from "@/types/response.type"
 import { toast } from "@/hooks/use-toast"
 import { useNavigate } from "react-router-dom"
 import { ReportFormSchema } from "@/schema/report"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+// import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu"
+
+interface DropdownMenuCheckboxesProps {
+  expenses: Expense[],
+  checkedExpenses: number[]
+  setCheckedExpenses: Dispatch<SetStateAction<number[]>>
+  form: any
+}
+
+export function DropdownMenuCheckboxes({
+  expenses,
+  checkedExpenses,
+  setCheckedExpenses,
+  form,
+}: DropdownMenuCheckboxesProps) {
+  const [open, setOpen] = React.useState(false); // Local state for controlling dropdown open/close
+
+  return (
+    <FormField control={form.control} name="expenseIDs" render={({ field }) => (
+      <FormItem className="flex flex-col">
+        <FormLabel className="text-white">Despesas</FormLabel>
+        <DropdownMenu open={open} onOpenChange={setOpen}>
+          <DropdownMenuTrigger asChild>
+            <Button variant="default" className="w-fit">Selecione as despesas do relatório</Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-64 bg-white text-black">
+            {expenses.map((expense) => {
+              const isChecked = checkedExpenses.includes(expense.id);
+
+              return (
+                <DropdownMenuCheckboxItem
+                  key={expense.id}
+                  checked={isChecked}
+                  onCheckedChange={(checked) => {
+                    setCheckedExpenses((prev) => {
+                      if (checked) {
+                        return [...prev, expense.id];
+                      } else {
+                        return prev.filter((id) => id !== expense.id);
+                      }
+                    });
+                  }}
+                >
+                  {expense.notes}
+                </DropdownMenuCheckboxItem>
+              );
+            })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <FormMessage className="text-red-500" />
+      </FormItem>
+    )} />
+  );
+}
 
 export default function CreateReportPage() {
-  const [approver, setApprover] = useState({});
-  const [creator, setCreator] = useState({});
+  const [approvers, setApprovers] = useState<ReportParam[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [checkedExpenses, setCheckedExpenses] = useState<number[]>([])
   const [isLoading, setIsLoading] = useState(true);
 
   const navigate = useNavigate()
@@ -38,21 +94,21 @@ export default function CreateReportPage() {
     resolver: zodResolver(ReportFormSchema),
     defaultValues: {
       name: "RPT-",
-      goal: ""
+      goal: "",
+      expenseIDs: [],
     },
   })
 
   async function fetchParams() {
     try {
       const { data } = await api.get<Response<ReportParams>>("/reports/params");
-    // TODO: esses states devem conter as coisas para adicionar no dropdown (de acordo com os approver da empresa do usuario logado por exemplo)
-      setCreator(data.payload.creator)
-      setApprover(data.payload.approver)
+      
+      setApprovers(data.payload.approvers)
       setExpenses(data.payload.expenses)
     } catch (err: any) {
       errorHandler(err);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
@@ -64,12 +120,17 @@ export default function CreateReportPage() {
 
     try {
       
-      // criando despesa
-      await api.post('/reports/', report)
+      // criando relatório
+      await api.post('/reports/', {
+        name: report.name,
+        goal: report.goal,
+        approverID: report.approverID,
+        expensesIds: checkedExpenses,
+      })
 
       toast({
         title: 'Sucesso!',
-        description: 'Despesa criada com sucesso!',
+        description: 'Relatório criado com sucesso!',
       });
 
       navigate('/reports')
@@ -119,6 +180,42 @@ export default function CreateReportPage() {
                   )}
                 />
 
+                {/* Aprovador */}
+                <FormField
+                    control={form.control}
+                    name="approverID"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-white">Aprovador <span className="text-red-500">*</span></FormLabel>
+                        <Select 
+                          onValueChange={(value) => field.onChange(Number(value))} 
+                          defaultValue={field.value?.toString()}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="bg-zinc-700 border-zinc-600 text-zinc-300">
+                              <SelectValue placeholder="Selecione um aprovador para o relatório" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="bg-zinc-700 border-zinc-600">
+                            {approvers.map((approver) => (
+                              <SelectItem 
+                                key={approver.id} 
+                                value={String(approver.id)}
+                                className="text-white hover:bg-zinc-600"
+                              >
+                                {approver.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage className="text-red-500"/>
+                      </FormItem>
+                    )}
+                  />
+
+                
+                </div>
+
                 {/* Goal */}
                 <FormField
                   control={form.control}
@@ -136,7 +233,9 @@ export default function CreateReportPage() {
                     </FormItem>
                   )}
                 />
-                </div>
+
+                {/* Despesas */}
+                <DropdownMenuCheckboxes checkedExpenses={checkedExpenses} expenses={expenses} setCheckedExpenses={setCheckedExpenses} form={form}/>
                 
                 <div className="flex justify-end">
                   <Button type="submit" className="w-60 bg-primary hover:bg-primary/90">

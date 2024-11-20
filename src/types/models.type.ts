@@ -54,12 +54,8 @@ export type ReportTableItem = {
     goal: string;
     name: string;
     total?: number;
-    creator: {
-        name: string;
-    }
-    approver: {
-        name: string;
-    }
+    creator: string;
+    approver: string;
     createdAt: string;
     updatedAt: string;
     status: ReportStatus
@@ -69,14 +65,18 @@ export interface UserWithCompanyName {
     id: number,
     name: string,
     company: { 
-      id: number,
-      name: string 
+        id: number,
+        name: string 
     }
-  }
+}
+
+export type ReportParam = {
+    id: number;
+    name: string;
+}
 
 export type ReportParams = {
-    approver: UserWithCompanyName,
-    creator: UserWithCompanyName,
+    approvers: ReportParam[]
     expenses: Expense[]
 }
 
@@ -135,6 +135,7 @@ export type Expense = {
     expenseDate: string,
     value: number,
     quantity: number,
+    notes?: string,
     project: {
         key: string
     },

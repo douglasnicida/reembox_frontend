@@ -36,14 +36,14 @@ export default function ReportsPage() {
           items: data.payload.items.map(report => ({
             id: report.id,
             key: report.id,
-            goal: report.goal,
             name: report.name,
+            goal: report.goal,
             total: report.total,
-            creator: {name: report.creator.name},
-            approver: {name: report.approver.name},
-            status: report.status,
+            creator: report.creator.name,
+            approver: report.approver.name,
             createdAt: report.createdAt,
-            updatedAt: report.updatedAt
+            updatedAt: report.updatedAt,
+            status: report.status,
           }))
         });
       } catch (err: any) {
@@ -68,14 +68,14 @@ export default function ReportsPage() {
                 onChange={(e) => setQ(e.target.value)}
               />
             </div>
-            <Button variant="default" className="text-sm font-bold" onClick={() => navigate("/reports/new")}>Criar +</Button>
+            <Button variant="default" className="text-sm font-bold" onClick={() => {navigate("/reports/new");}}>Criar +</Button>
           </div>
 
           <div className="p-4">
             <TableComponent 
               resource="reports"
               data={data}
-              columnHeaders={['Nome', 'Objetivo', 'Status', 'Criador', 'Aprovador', 'Total']}
+              columnHeaders={['ID','Nome', 'Objetivo', 'Total', 'Criador', 'Aprovador', 'Criado em', 'Atualizado em', 'Status']}
               onPageChange={fetchReports}
             />
           </div>

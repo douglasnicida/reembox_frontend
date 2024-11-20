@@ -119,8 +119,24 @@ export const dtoList = {
              apiReqKey: "active"
            }
          ], 
-        req: '/expense-category/'
+        req: '/expense-categories/'
       },
+      "create-project": {
+        description: "Preencha os campos abaixo para criar seu projeto.",
+        fields: [
+          {
+            label: "Nome",
+            type: "text",
+            apiReqKey: "name"
+          },
+          {
+            label: "Código",
+            type: "text",
+            apiReqKey: "key"
+          },
+          
+        ]
+      }
       // Exemplo para create-job-title:
       // ...
       // Exemplo para create-project:
