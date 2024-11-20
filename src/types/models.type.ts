@@ -65,6 +65,21 @@ export type ReportTableItem = {
     status: ReportStatus
 }
 
+export interface UserWithCompanyName {
+    id: number,
+    name: string,
+    company: { 
+      id: number,
+      name: string 
+    }
+  }
+
+export type ReportParams = {
+    approver: UserWithCompanyName,
+    creator: UserWithCompanyName,
+    expenses: Expense[]
+}
+
 export type ReportExpense = {
     expense: Expense;
     report: Report;

@@ -62,23 +62,9 @@ export default function CreateExpensePage() {
   })
 
   async function handleUploadFiles(file: File) {
-    // let result = 'RCPT-'
 
     const formData = new FormData();
     formData.append('file', file);
-
-    // for(let i=0 ; i<4 ; i++) {
-    //   const randomIndex = Math.floor(Math.random() * chars.length);
-    //   result += chars[randomIndex];
-    // }
-
-    // const fileDTO = {
-    //   fieldname: file.name,
-    //   originalname: result,
-    //   mimetype: file.type,
-    //   buffer: file.arrayBuffer,
-    //   size: file.size
-    // }
 
     const { data } = await api.post("/upload/", formData, {
       headers: {

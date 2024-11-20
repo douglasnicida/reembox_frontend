@@ -22,7 +22,7 @@ export default function ReportsPage() {
   
     const navigate = useNavigate()
   
-    async function fetchExpenses(page: number, size: number = 10) {
+    async function fetchReports(page: number, size: number = 10) {
       try {
         const { data } = await api.get<PaginatedResponse<Report>>("/reports", {
           params: {
@@ -52,34 +52,35 @@ export default function ReportsPage() {
     }
   
     React.useEffect(() => {
-      fetchExpenses(1);
+      fetchReports(1);
     }, []);
+
     return (
         <>
-            <div className="flex-1 overflow-auto">
-        <div className="flex items-center justify-between gap-4 border-b border-zinc-700 bg-zinc-800 p-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-zinc-400" />
-            <Input 
-              placeholder="Buscar..." 
-              className="pl-8 bg-zinc-700 border-zinc-600" 
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
+        <div className="flex-1 overflow-auto">
+          <div className="flex items-center justify-between gap-4 border-b border-zinc-700 bg-zinc-800 p-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-zinc-400" />
+              <Input 
+                placeholder="Buscar..." 
+                className="pl-8 bg-zinc-700 border-zinc-600" 
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+              />
+            </div>
+            <Button variant="default" className="text-sm font-bold" onClick={() => navigate("/reports/new")}>Criar +</Button>
+          </div>
+
+          <div className="p-4">
+            <TableComponent 
+              resource="reports"
+              data={data}
+              columnHeaders={['Nome', 'Objetivo', 'Status', 'Criador', 'Aprovador', 'Total']}
+              onPageChange={fetchReports}
             />
           </div>
-          <Button variant="default" className="text-sm font-bold" onClick={() => navigate("/expense/new")}>Criar +</Button>
         </div>
-
-        <div className="p-4">
-          <TableComponent 
-            resource="reports"
-            data={data}
-            columnHeaders={['Nome', 'Objetivo', 'Status', 'Criador', 'Aprovador', 'Total']}
-            onPageChange={fetchExpenses}
-          />
-        </div>
-      </div>
-      <Toaster />
+        <Toaster />
         </>
     )
 }
