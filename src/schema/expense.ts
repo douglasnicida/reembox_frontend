@@ -5,7 +5,6 @@ export const ExpenseFormSchema = z.object({
     required_error: "A data de criação é obrigatória",
   }),
   images: z
-    //verificar se aqui é lista de files mesmo ou FileList
     .custom<FileList>()
     .refine((files) => files?.length > 0, "Pelo menos um comprovante é obrigatório")
     .refine(
