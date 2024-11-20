@@ -6,7 +6,7 @@ export const ExpenseFormSchema = z.object({
   }),
   images: z
     //verificar se aqui é lista de files mesmo ou FileList
-    .custom<File[]>()
+    .custom<FileList>()
     .refine((files) => files?.length > 0, "Pelo menos um comprovante é obrigatório")
     .refine(
       (files) => {

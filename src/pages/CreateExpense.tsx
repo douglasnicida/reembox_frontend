@@ -47,7 +47,6 @@ export default function CreateExpensePage() {
   const [projects, setProjects] = useState<ExpenseParam[]>([]);
   const [categories, setCategories] = useState<ExpenseParam[]>([]);
   const [reports, setReports] = useState<ExpenseParam[]>([]);
-  const [receiptsURLs, setReceiptURLs] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const navigate = useNavigate()
@@ -63,9 +62,31 @@ export default function CreateExpensePage() {
   })
 
   async function handleUploadFiles(file: File) {
-    const { data } = await api.post("/upload", file)
+    // let result = 'RCPT-'
 
-    return data;
+    const formData = new FormData();
+    formData.append('file', file);
+
+    // for(let i=0 ; i<4 ; i++) {
+    //   const randomIndex = Math.floor(Math.random() * chars.length);
+    //   result += chars[randomIndex];
+    // }
+
+    // const fileDTO = {
+    //   fieldname: file.name,
+    //   originalname: result,
+    //   mimetype: file.type,
+    //   buffer: file.arrayBuffer,
+    //   size: file.size
+    // }
+
+    const { data } = await api.post("/upload/", formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+
+    return data.payload;
   }
 
   async function fetchParams() {
@@ -88,6 +109,9 @@ export default function CreateExpensePage() {
   }, []);
 
   async function onSubmit(expense: z.infer<typeof ExpenseFormSchema>) {
+    const receiptURLs: string[] = []
+    const receiptIDs: number[] = []
+
     try {
       const { images, ...rest } = expense
       const formData = new FormData()
@@ -97,29 +121,36 @@ export default function CreateExpensePage() {
       }
 
       // Ver como recupera os Files do FileList
-      images.forEach(async (file: File) => {
+      for(let i=0 ; i<images.length ; i++) {
+        // Recuperando File
+        const file: File = images[i]
+
         // Fazer o upload no endpoint de upload
         const publicFileURL: string = await handleUploadFiles(file);
         
-        //salvar todas as URLs geradas dentro do State de ReceiptsURL
-        setReceiptURLs((prev) => [...prev, publicFileURL]);
-          
+        //salvar todas as URLs geradas dentro de ReceiptsURL
+        receiptURLs.push(publicFileURL)
+      }
+
+      // criando recibos sem vincular a uma despesa
+      receiptURLs.forEach(async (url: string) => {
+        const { data } = await api.post('/receipts/', {
+          url,
+        })
+
+        receiptIDs.push(data.payload)
       })
 
-      console.log({
-        ...rest,
-        expenseDate: expense.expenseDate.toISOString()        
-      });
-
+      // criando despesa
       const expenseID = await api.post('expenses', {
         ...rest,
         expenseDate: expense.expenseDate.toISOString()        
       })
 
-      receiptsURLs.forEach(async (url: string) => {
-        await api.post('/receipts', {
-          url,
-          expenseId: expenseID
+      // atribuindo aos recibos o ID da despesa
+      receiptIDs.forEach(async (id: number) => {
+        await api.patch(`/receipts/${id}`, {
+          expenseId: expenseID.data.payload,
         })
       })
 

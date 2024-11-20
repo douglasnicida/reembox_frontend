@@ -52,7 +52,6 @@ function UploadInput({ onChange }: UploadInputProps) {
             className="text-xs text-zinc-400 mt-1 text-center truncate w-32"
             title={file.name}
           >
-            {/* <Trash2Icon className="absolute top-0 right-0 cursor-pointer h-10 w-10" width={10} height={10} /> */}
             {file.name.length > 50 ? `${file.name.slice(0, 50)}...${file.type}` : file.name}
           </p>
         </div>
