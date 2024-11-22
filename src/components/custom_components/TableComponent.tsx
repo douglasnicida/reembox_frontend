@@ -10,27 +10,33 @@ import { errorHandler } from "@/utils/errorHandler";
 import React from "react";
 import { MoreVertical } from "lucide-react";
 import { handleFormatDate } from "@/utils/handleDate";
+import { Checkbox } from "../ui/checkbox"; // Certifique-se de que Checkbox está importado
 
 export interface TableProps<T> {
   resource?: string;
-  data: Paginated<T>
+  data: Paginated<T>;
   columnHeaders: string[];
   onPageChange: (page: number) => void;
+  onSelectionChange: (selectedIds: number[]) => void; // Nova propriedade
 }
 
 export default function TableComponent<T extends Record<string, any>>(
-  { resource, data, columnHeaders, onPageChange }: TableProps<T>
+  { resource, data, columnHeaders, onPageChange, onSelectionChange }: TableProps<T>
 ) {
   const [items, setItems] = React.useState(data.items);
+  const [selectedItems, setSelectedItems] = React.useState<number[]>([]); // Armazena os IDs dos itens selecionados
 
   React.useEffect(() => {
     setItems(data.items);
   }, [data.items]);
 
+  React.useEffect(() => {
+    onSelectionChange(selectedItems); // Chama a função para atualizar a seleção no componente pai
+  }, [selectedItems]);
+
   const handleToggle = async (id: number, active: boolean) => {
     try {
       await axios.delete(`${resource}/${id}`);
-  
       // Atualiza localmente o estado
       setItems((prevItems) =>
         prevItems.map((item) =>
@@ -42,11 +48,34 @@ export default function TableComponent<T extends Record<string, any>>(
     }
   };
 
+  const handleCheckboxChange = (id: number) => {
+    setSelectedItems((prevSelected) => {
+      if (prevSelected.includes(id)) {
+        return prevSelected.filter(itemId => itemId !== id); // Desmarcar
+      } else {
+        return [...prevSelected, id]; // Marcar
+      }
+    });
+  };
+
   // Gera as células da tabela
   const GenerateTableCell = (item: T) =>
     Object.entries(item)
       .map(([key, value]) => {
         if (key === "id") return null;
+
+        if (key === "selected" && columnHeaders.includes(' ')) {
+          return (
+            <TableCell key={key}>
+              <Checkbox 
+                checked={selectedItems.includes(item.id)} 
+                onCheckedChange={() => handleCheckboxChange(item.id)} 
+              />
+            </TableCell>
+          );
+        } else if (key === "selected") {
+          return null;
+        }
 
         if (key === "active") {
           return (
@@ -59,9 +88,9 @@ export default function TableComponent<T extends Record<string, any>>(
               />
             </TableCell>
           );
-        } 
-        
-        value = handleFormatDate(value)
+        }
+
+        value = handleFormatDate(value);
         return <TableCell key={key}>{value}</TableCell>;
       })
       .filter((cell) => cell !== null);
