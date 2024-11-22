@@ -168,7 +168,7 @@ export default function FinancialPage() {
           <div className="p-9 grid grid-cols-1 xl:grid-cols-3 gap-5 overflow-y-scroll w-full">
             
             {
-              data.length > 0 ? data.map((report: any) => {
+              data && data.length > 0 ? data.map((report: any) => {
                 return(
                   <ApprovalReportCard key={report.id + Math.floor(Math.random() * 100)} report={report} navigate={navigate}/>
                 )
