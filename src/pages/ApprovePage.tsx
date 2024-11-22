@@ -60,8 +60,6 @@ function VerifyAndApproveDialog({ reportStatus, currentReport }: VerifyAndApprov
     }
   }
 
-  // TODO: perguntar em qual tela que ele poderá ser submetido após o OPEN (OPEN -> SUBMITTED -> APPROVED)
-
   return (
     <div className="absolute right-5 bottom-0">
       <AlertDialog>

@@ -17,7 +17,7 @@ export interface TableProps<T> {
   data: Paginated<T>;
   columnHeaders: string[];
   onPageChange: (page: number) => void;
-  onSelectionChange: (selectedIds: number[]) => void; // Nova propriedade
+  onSelectionChange?: (selectedIds: number[]) => void; // Nova propriedade
 }
 
 export default function TableComponent<T extends Record<string, any>>(
@@ -31,7 +31,9 @@ export default function TableComponent<T extends Record<string, any>>(
   }, [data.items]);
 
   React.useEffect(() => {
-    onSelectionChange(selectedItems); // Chama a função para atualizar a seleção no componente pai
+    if (onSelectionChange) {
+      onSelectionChange(selectedItems); 
+    }
   }, [selectedItems]);
 
   const handleToggle = async (id: number, active: boolean) => {
