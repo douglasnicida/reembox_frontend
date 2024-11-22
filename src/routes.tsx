@@ -17,6 +17,7 @@ import CreateExpensePage from './pages/CreateExpense';
 import CreateReportPage from './pages/CreateReport';
 import ApprovePage from './pages/ApprovePage';
 import ReportDetailsPage from './pages/ReportDetails';
+import FinancialPage from './pages/FinancialPage';
 
 export default function AppRoute() {
     const { activeItem, setActiveItem } = useActiveItem();
@@ -49,7 +50,7 @@ export default function AppRoute() {
                         <Route path="/expense-categories" element={<ExpenseCategoryPage/>}/>
                         <Route path="/projects" element={<ProjectPage/>}/>
                         <Route path="/customers" element={<CustomerPage/>}/>
-                        <Route path="/financial" element={<App/>}/>
+                        <Route path="/financial" element={<FinancialPage/>}/>
                         <Route path="/approval" element={<ApprovePage/>}/>
 
                         <Route path="/expense/new" element={<CreateExpensePage/>}/>
