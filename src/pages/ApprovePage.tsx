@@ -165,7 +165,7 @@ export default function ApprovePage() {
             <Button variant="default" className="text-sm font-bold" onClick={() => {navigate("/reports/new");}}>Criar +</Button>
           </div>
 
-          <div className="p-9 grid grid-cols-1 xl:grid-cols-3 gap-5 overflow-y-scroll w-full">
+          <div className="p-9 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 overflow-y-scroll w-fit mx-auto">
             
             {
               data && data.length > 0 ? data.map((report: any) => {
