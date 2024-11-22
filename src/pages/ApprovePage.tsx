@@ -44,12 +44,14 @@ interface VerifyAndApproveDialogProps {
 
 function VerifyAndApproveDialog({ reportStatus, currentReport }: VerifyAndApproveDialogProps) {
   
-  async function handleApproval() {
+  async function handleApproval(approvedStatus: boolean) {
+    const endpoint = (approvedStatus === true) ? `/reports/manager/approve/${currentReport.id}` : `/reports/approver/reject/${currentReport.id}`
+
     try {
-      await api.patch(`/submit/${currentReport.id}`)
+      const response = await api.patch(endpoint)
       toast({
         title: 'Sucesso!',
-        description: 'Relatório foi aprovado com sucesso!',
+        description: response.data.message,
       });
     } catch(e: any) {
       toast({
@@ -68,14 +70,15 @@ function VerifyAndApproveDialog({ reportStatus, currentReport }: VerifyAndApprov
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Deseja aprovar este relatório?</AlertDialogTitle>
+            <AlertDialogTitle>Deseja aprovar ou rejeitar este relatório?</AlertDialogTitle>
             <AlertDialogDescription>
               Essa ação não poderá ser desfeita a partir do momento em que for aprovado.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleApproval}>Aprovar</AlertDialogAction>
+            <AlertDialogAction onClick={() => {handleApproval(false)}}>Rejeitar</AlertDialogAction>
+            <AlertDialogAction onClick={() => {handleApproval(true)}}>Aprovar</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
