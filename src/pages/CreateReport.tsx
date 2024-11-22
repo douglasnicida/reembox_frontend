@@ -27,10 +27,11 @@ import { useNavigate } from "react-router-dom"
 import { ReportFormSchema } from "@/schema/report"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { handleFormatDate } from "@/utils/handleDate"
 // import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu"
 
 interface DropdownMenuCheckboxesProps {
-  expenses: Expense[],
+  expenses: any[],
   checkedExpenses: number[]
   setCheckedExpenses: Dispatch<SetStateAction<number[]>>
   form: any
@@ -55,7 +56,6 @@ export function DropdownMenuCheckboxes({
           <DropdownMenuContent className="w-64 bg-white text-black">
             {expenses.map((expense) => {
               const isChecked = checkedExpenses.includes(expense.id);
-
               return (
                 <DropdownMenuCheckboxItem
                   key={expense.id}
@@ -70,7 +70,8 @@ export function DropdownMenuCheckboxes({
                     });
                   }}
                 >
-                  {expense.notes}
+                  {/* TODO: arrumar o expense category e o project */}
+                  {`${handleFormatDate(expense.expenseDate)} - ${expense.category.description} - ${expense.project.name}`}
                 </DropdownMenuCheckboxItem>
               );
             })}

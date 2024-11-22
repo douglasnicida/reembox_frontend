@@ -16,6 +16,7 @@ import ExpensePage from './pages/Expense';
 import CreateExpensePage from './pages/CreateExpense';
 import CreateReportPage from './pages/CreateReport';
 import ApprovePage from './pages/ApprovePage';
+import ReportDetailsPage from './pages/ReportDetails';
 
 export default function AppRoute() {
     const { activeItem, setActiveItem } = useActiveItem();
@@ -53,6 +54,7 @@ export default function AppRoute() {
 
                         <Route path="/expense/new" element={<CreateExpensePage/>}/>
                         <Route path="/reports/new" element={<CreateReportPage/>}/>
+                        <Route path="/reports/:id/details" element={<ReportDetailsPage />}/>
                     </Routes>
                 </div>
             </div>

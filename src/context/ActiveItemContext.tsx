@@ -24,6 +24,7 @@ const RoutesMap: Record<string, string> = {
     "/config": "Configurações",
     '/expense/new': "Nova despesa",
     "/reports/new": "Novo Relatório",
+    "/reports/:id/details": "Detalhes Relatório",
 }
 
 const ActiveItemContext = createContext<ActiveItemContextType | undefined>(undefined);
