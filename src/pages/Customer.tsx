@@ -19,7 +19,9 @@ import api from "@/api/axios";
 import { Paginated, PaginatedResponse } from "@/types/response.type";
 import CreationDialog from "@/components/custom_components/CreationDialog";
 import { dtoList } from "@/lib/utils";
+import { dtoUpdateList } from "@/lib/utilsUpdate";
 import { useActiveItem } from "@/context/ActiveItemContext";
+import UpdateDialog from "@/components/custom_components/UpdateDialog";
 
 export default function CustomerPage() {
   const [q, setQ] = useState<string>("");
@@ -31,6 +33,8 @@ export default function CustomerPage() {
     currentPage: 1,
     size: 10,
   });
+  const [editId, setEditId] = useState<number | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { activeItem } = useActiveItem();
 
   async function fetchCustomers(page: number, size: number = 10) {
@@ -62,6 +66,15 @@ export default function CustomerPage() {
     e.preventDefault();
     fetchCustomers(1);
   }
+
+  const handleOpenEditModal = (id: number) => {
+    setEditId(id);
+    setIsEditModalOpen(true);
+  };
+  const handleCloseEditModal = () => {
+    setEditId(null);
+    setIsEditModalOpen(false);
+  };
 
   return (
     <>
@@ -123,9 +136,19 @@ export default function CustomerPage() {
             data={data}
             columnHeaders={['Nome', 'Telefone', 'E-mail', 'Criado em', 'Atualizado em', 'Ativo' ]} 
             onPageChange={fetchCustomers}
+            onEdit={handleOpenEditModal}
           />
         </div>
       </div>
+      {isEditModalOpen && (
+          <UpdateDialog
+              dtoList={dtoUpdateList.dtos}
+              currentLabel="Clientes"
+              editId={editId}
+              isOpen={isEditModalOpen}
+              onClose={handleCloseEditModal}
+          />
+      )}
       <Toaster />
     </>
   );

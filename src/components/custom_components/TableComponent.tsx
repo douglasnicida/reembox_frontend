@@ -16,10 +16,11 @@ export interface TableProps<T> {
   data: Paginated<T>
   columnHeaders: string[];
   onPageChange: (page: number) => void;
+  onEdit: (id: number) => void;
 }
 
 export default function TableComponent<T extends Record<string, any>>(
-  { resource, data, columnHeaders, onPageChange }: TableProps<T>
+  { resource, data, columnHeaders, onPageChange,onEdit }: TableProps<T>
 ) {
   const [items, setItems] = React.useState(data.items);
 
@@ -91,7 +92,7 @@ export default function TableComponent<T extends Record<string, any>>(
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Editar</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onEdit(item.id)}>Editar</DropdownMenuItem>
                       <DropdownMenuItem>Excluir</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
