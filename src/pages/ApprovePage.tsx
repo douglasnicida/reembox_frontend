@@ -23,13 +23,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { toast } from "@/hooks/use-toast";
 
 const statusColors: { [key: string]: string } = {
-  OPEN: "bg-yellow-300 text-yellow-700",
-  SUBMITTED: "bg-blue-500 text-white",
-  REJECTED: "bg-red-500 text-white",
-  APPROVED: "bg-green-500 text-white",
-  PENDING_PROCESSING: "bg-orange-500 text-white",
-  PROCESSING_ERROR: "bg-gray-500 text-white",
-  PROCESSING_PAYMENT: "bg-purple-500 text-white",
+  OPEN: "bg-yellow-300 text-yellow-700 hover:text-black",
+  SUBMITTED: "bg-blue-500 text-white hover:text-black",
+  REJECTED: "bg-red-500 text-white hover:text-black",
+  APPROVED: "bg-green-500 text-white hover:text-black",
+  PENDING_PROCESSING: "bg-orange-500 text-white hover:text-black",
+  PROCESSING_ERROR: "bg-gray-500 text-white hover:text-black",
+  PROCESSING_PAYMENT: "bg-purple-500 text-white hover:text-black",
 };
 
 interface ApprovalReportCardProps {
