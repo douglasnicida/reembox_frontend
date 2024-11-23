@@ -17,11 +17,12 @@ export interface TableProps<T> {
   data: Paginated<T>;
   columnHeaders: string[];
   onPageChange: (page: number) => void;
-  onSelectionChange?: (selectedIds: number[]) => void; // Nova propriedade
+  onSelectionChange?: (selectedIds: number[]) => void;
+  customActions?: (item: T) => React.ReactNode;
 }
 
 export default function TableComponent<T extends Record<string, any>>(
-  { resource, data, columnHeaders, onPageChange, onSelectionChange }: TableProps<T>
+  { resource, data, columnHeaders, onPageChange, onSelectionChange, customActions }: TableProps<T>
 ) {
   const [items, setItems] = React.useState(data.items);
   const [selectedItems, setSelectedItems] = React.useState<number[]>([]); // Armazena os IDs dos itens selecionados
@@ -122,6 +123,7 @@ export default function TableComponent<T extends Record<string, any>>(
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
+                      {customActions && customActions(item)}
                       <DropdownMenuItem>Editar</DropdownMenuItem>
                       <DropdownMenuItem>Excluir</DropdownMenuItem>
                     </DropdownMenuContent>

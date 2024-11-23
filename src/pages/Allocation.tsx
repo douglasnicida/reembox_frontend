@@ -3,7 +3,6 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -12,73 +11,61 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Filter } from "lucide-react";
 import TableComponent from "@/components/custom_components/TableComponent";
-import { Customer } from "@/types/models.type";
+import { Allocation } from "@/types/models.type";
 import { Toaster } from "@/components/ui/toaster";
 import { errorHandler } from "@/utils/errorHandler";
 
 import api from "@/api/axios";
 import { Paginated, PaginatedResponse } from "@/types/response.type";
-import CreationDialog from "@/components/custom_components/CreationDialog";
-import { dtoList } from "@/lib/utils";
-import { useActiveItem } from "@/context/ActiveItemContext";
-import ApprovalRAGDialog from "./ApprovalRAGDialog";
+import { useNavigate } from "react-router-dom";
+import { convertISOToDDMMYYYY } from "@/utils/handleDate";
+import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
 
-export default function CustomerPage() {
-  const [q, setQ] = useState<string>("");
+export default function AllocationPage() {
+  const [q, setQ] = useState("");
   const [active, setActive] = useState<boolean | undefined>(undefined);
-  const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
-  const [data, setData] = useState<Paginated<Customer>>({
+  const [data, setData] = useState<Paginated<Allocation>>({
     items: [],
     totalItems: 0,
     totalPages: 0,
     currentPage: 1,
     size: 10,
   });
-  const { activeItem } = useActiveItem();
 
-  async function fetchCustomers(page: number, size: number = 10) {
+  async function fetchAllocations(page: number, size: number = 10) {
     try {
-      const params: Record<string, any> = { page, size };
-
-      if (q) params.q = q;
-
-      if (typeof active === "boolean") {
-        params.active = active ? 1 : 0;
-      }
-
-      const { data } = await api.get<PaginatedResponse<Customer>>(
-        "/customers",
-        { params }
-      );
-
-      setData(data.payload);
+      const { data } = await api.get<PaginatedResponse<Allocation>>(`/allocations?page=${page}&size=${size}`);
+      setData({
+        ...data.payload,
+        items: data.payload.items.map(item => ({
+          id: item.id,
+          userName: item.user.name,
+          jobTitle: item.user.jobTitle?.title || "Sem cargo",
+          project: `${item.project.key} - ${item.project.name}`,
+          startDate: convertISOToDDMMYYYY(item.startDate),
+          estimatedEndDate: convertISOToDDMMYYYY(item.estimatedEndDate),
+          endDate: item.endDate ? convertISOToDDMMYYYY(item.endDate) : "Em andamento",
+        })) as any
+      });
+      
     } catch (err: any) {
       errorHandler(err);
     }
   }
 
+  console.log(data)
+
+
+  const navigate = useNavigate()
+
   useEffect(() => {
-    fetchCustomers(1);
+    fetchAllocations(1);
   }, [active]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    fetchCustomers(1);
+    fetchAllocations(1);
   }
-
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  const renderCustomActions = (item: Customer) => (
-      <>
-      <DropdownMenuItem onClick={() => {
-          setSelectedCustomerId(item.id);
-          setIsDialogOpen(true);
-        }}>
-        Aprovar RAG
-      </DropdownMenuItem>
-    </>
-  );
-
 
   return (
     <>
@@ -101,7 +88,7 @@ export default function CustomerPage() {
               />
             </div>
 
-            <CreationDialog dtoList={dtoList.dtos} currentLabel={activeItem} />
+            <Button variant="default" className="text-sm font-bold" onClick={() => navigate("/allocations/new")}>Criar +</Button>
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -136,22 +123,14 @@ export default function CustomerPage() {
         </form>
 
         <div className="p-4">
-          <TableComponent 
-            resource="customers"
-            data={data}
-            columnHeaders={['Nome', 'Telefone', 'E-mail', 'Criado em', 'Atualizado em', 'Ativo' ]} 
-            onPageChange={fetchCustomers}
-            customActions={renderCustomActions}
+          <TableComponent
+            resource="allocations"
+            data={data} 
+            columnHeaders={['Nome', 'Cargo', 'Projeto', 'Início', 'Término estimado', 'Término']} 
+            onPageChange={fetchAllocations}
           />
         </div>
       </div>
-
-      <ApprovalRAGDialog
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        customerId={selectedCustomerId}
-      />
-      
       <Toaster />
     </>
   );

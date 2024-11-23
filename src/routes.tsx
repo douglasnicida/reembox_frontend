@@ -16,8 +16,10 @@ import ExpensePage from './pages/Expense';
 import CreateExpensePage from './pages/CreateExpense';
 import CreateReportPage from './pages/CreateReport';
 import ApprovePage from './pages/ApprovePage';
-import ReportDetailsPage from './pages/ReportDetails';
-import FinancialPage from './pages/FinancialPage';
+import AllocationPage from './pages/Allocation';
+import CreateAllocationPage from './pages/CreateAllocation';
+import MyAllocationsPage from './pages/MyAllocations';
+import ContextPage from './pages/Context';
 
 export default function AppRoute() {
     const { activeItem, setActiveItem } = useActiveItem();
@@ -50,12 +52,14 @@ export default function AppRoute() {
                         <Route path="/expense-categories" element={<ExpenseCategoryPage/>}/>
                         <Route path="/projects" element={<ProjectPage/>}/>
                         <Route path="/customers" element={<CustomerPage/>}/>
-                        <Route path="/financial" element={<FinancialPage/>}/>
+                        <Route path="/allocations" element={<AllocationPage/>}/>
+                        <Route path="/financial" element={<App/>}/>
                         <Route path="/approval" element={<ApprovePage/>}/>
-
                         <Route path="/expense/new" element={<CreateExpensePage/>}/>
                         <Route path="/reports/new" element={<CreateReportPage/>}/>
-                        <Route path="/reports/:id/details" element={<ReportDetailsPage />}/>
+                        <Route path="/allocations/new" element={<CreateAllocationPage/>}/>
+                        <Route path="/allocations/my" element={<MyAllocationsPage/>}/>
+                        <Route path="/context" element={<ContextPage/>}/>
                     </Routes>
                 </div>
             </div>

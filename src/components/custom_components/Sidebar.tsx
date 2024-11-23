@@ -18,6 +18,8 @@ import {
     CircleUser,
     Package,
     PackageOpen,
+    BetweenHorizonalStart,
+    PlaneLanding,
 } from "lucide-react"
 import { Button } from "../ui/button"
 import { useActiveItem } from "@/context/ActiveItemContext.tsx";
@@ -95,6 +97,12 @@ const sideBarItems = {
                     "label": "Projetos",
                     "path": "/projects",
                     "roles": ["ADMIN"]
+                },
+                {
+                    "Icon": BetweenHorizonalStart,
+                    "label": "Alocações",
+                    "path": "/allocations",
+                    "roles": ["ADMIN", "APPROVER"]
                 }
             ]
         },
@@ -114,8 +122,25 @@ const sideBarItems = {
                     "roles": ["ADMIN", "FINANCE"]
                 }
             ]
+        },
+        {
+            "title": "Adicional",
+            "items": [
+                {
+                    "Icon": BetweenHorizonalStart,
+                    "label": "Minhas alocações",
+                    "path": "/allocations/my",
+                    "roles": ["ADMIN", "USER"]
+                },
+                {
+                    "Icon": PlaneLanding,
+                    "label": "Contexto",
+                    "path": "/context",
+                    "roles": ["ADMIN", "USER"]
+                }
+            ]
         }
-    ]
+    ],
 }
 
 function SidebarItem({ Icon, label, active, onClick }: SidebarProps) {
@@ -159,7 +184,6 @@ export default function Sidebar() {
 
     return (
         <div className="w-64 bg-zinc-800 p-4 h-full flex flex-col border-r border-zinc-700">
-            {/* Cabeçalho da Sidebar */}
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <div className="py-0.5 px-2.5 h-16 flex gap-x-5 cursor-default" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
@@ -176,7 +200,6 @@ export default function Sidebar() {
                 </DropdownMenuTrigger>
             </DropdownMenu>
 
-            {/* Navegação */}
             <nav className="flex-grow h-screen overflow-y-auto mt-4">
                 <SidebarItem Icon={Home} label="Início" active={activeItem === "Início"} onClick={() => handleItemClick("Início", "/home")} />
                 <Separator className="my-2 bg-zinc-700" />
@@ -198,7 +221,6 @@ export default function Sidebar() {
                 })}
             </nav>
 
-            {/* Dropdown Menu no final da Sidebar */}
             <div className="absolute bottom-2 left-0">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -211,10 +233,7 @@ export default function Sidebar() {
                             <ChevronsUpDown />
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                            side="top"
-                            className="w-[--radix-popper-anchor-width] flex flex-col gap-y-2"
-                        >
+                    <DropdownMenuContent side="top" className="w-[--radix-popper-anchor-width] flex flex-col gap-y-2">
                             <DropdownMenuItem onClick={() => {navigate('/my-account')}} className="cursor-pointer h-10">
                                 <span className="flex gap-x-3 items-center"><CircleUser size={16} />Minha Conta</span>
                             </DropdownMenuItem>
