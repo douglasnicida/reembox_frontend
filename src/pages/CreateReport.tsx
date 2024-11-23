@@ -240,7 +240,7 @@ export default function CreateReportPage() {
                 
                 <div className="flex justify-end">
                   <Button type="submit" className="w-60 bg-primary hover:bg-primary/90">
-                    Criar Despesa
+                    Criar Relatório
                   </Button>
                 </div>
               </form>
