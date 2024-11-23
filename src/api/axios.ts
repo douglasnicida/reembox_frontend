@@ -9,7 +9,7 @@ const createAxiosInstance = () => {
         headers: {
             Authorization: token ? "Bearer " + token : undefined
         },
-        timeout: 1500
+        timeout: 10000
     } as Partial<CreateAxiosDefaults>;
 
     return axios.create(axiosParams);

@@ -6,6 +6,11 @@
   list-style: none;
 }
 
+body {
+  overflow-y: hidden;
+  height: 100vh;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

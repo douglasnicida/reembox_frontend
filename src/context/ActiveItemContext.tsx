@@ -4,6 +4,8 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 interface ActiveItemContextType {
     activeItem: string;
     setActiveItem: React.Dispatch<React.SetStateAction<string>>;
+    reload: boolean;
+    setReload: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const RoutesMap: Record<string, string> = {
@@ -17,9 +19,15 @@ const RoutesMap: Record<string, string> = {
     "/expense-categories": "Tipos de Despesa",
     "/projects": "Projetos",
     "/customers": "Clientes",
+    "/allocations": "Alocações",
     "/financial": "Financeiro",
     "/approval": "Aprovação",
     "/config": "Configurações",
+    "/expense/new": "Nova despesa",
+    "/reports/new": "Novo Relatório",
+    "/allocations/new": "Nova alocação",
+    "/allocations/my": "Minhas alocações",
+    "/context": "Contexto"
 }
 
 const ActiveItemContext = createContext<ActiveItemContextType | undefined>(undefined);
@@ -34,23 +42,20 @@ export const useActiveItem = () => {
 
 export const ActiveItemProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
-    // TODO: implementar AuthContext para funcionar corretamente
-    const token = 'a';
-
     useEffect(() => {
         const location = window.location.pathname;
         
-        if(token.length > 0){
-            setActiveItem('Início')
-            setActiveItem(RoutesMap[location]);
-        }
+        setActiveItem('Início')
+        setActiveItem(RoutesMap[location]);
+
 
     }, [window.location.pathname]);
 
     const [activeItem, setActiveItem] = useState<string>('');
+    const [reload, setReload] = useState<boolean>(true);
 
     return (
-        <ActiveItemContext.Provider value={{ activeItem, setActiveItem }}>
+        <ActiveItemContext.Provider value={{ activeItem, setActiveItem, reload, setReload }}>
             {children}
         </ActiveItemContext.Provider>
     );

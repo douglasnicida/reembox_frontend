@@ -1,6 +1,10 @@
 import * as React from "react";
 import {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -11,98 +15,123 @@ import { CostCenter } from "@/types/models.type";
 import { Toaster } from "@/components/ui/toaster";
 import { errorHandler } from "@/utils/errorHandler";
 
-import { Pagination } from "@/components/custom_components/Pagination";
 import api from "@/api/axios";
-import { Paginated } from "@/types/response.type";
+import { useActiveItem } from "@/context/ActiveItemContext";
+import { Paginated, PaginatedResponse } from "@/types/response.type";
+import CreationDialog from "@/components/custom_components/CreationDialog";
+import { dtoList } from "@/lib/utils";
 
 export default function CostCenterPage() {
-  const [searchTerm, setSearchTerm] = React.useState("");
-  const [data, setData] = React.useState<Paginated<CostCenter>>({
-    payload: {
-      items: [],
-      totalItems: 0,
-      totalPages: 0,
-      currentPage: 1,
-      size: 10,
-    },
-  });
+    const { reload, activeItem } = useActiveItem()
 
-  async function fetchCostCenters(page: number, size: number = 10) {
-    try {
-      const response = await api.get<Paginated<CostCenter>>("/cost-centers", {
-        params: {
-          page,
-          size,
-        },
-      });
+    const [q, setQ] = React.useState<string>("");
+    const [active, setActive] = React.useState<boolean | undefined>(undefined);
+    const [data, setData] = React.useState<Paginated<CostCenter>>({
+        items: [],
+        totalItems: 0,
+        totalPages: 0,
+        currentPage: 1,
+        size: 10,
+    });
 
-      console.log(response.data);
-      
-      
-      setData(response.data);
-    } catch (err: any) {
-      errorHandler(err);
+    async function fetchCostCenters(page: number, size: number = 10) {
+        try {
+            const params: Record<string, any> = { page, size };
+            if (q) params.q = q;
+
+            if (typeof active === "boolean") {
+                params.active = active ? 1 : 0;
+            }
+
+            const { data } = await api.get<PaginatedResponse<CostCenter>>(
+                "/cost-centers",
+                { params }
+            );
+            setData(data.payload);
+        } catch (err: any) {
+            errorHandler(err);
+        }
     }
-  }
 
-  React.useEffect(() => {
-    fetchCostCenters(1);
-  }, []);
+    React.useEffect(() => {
+        fetchCostCenters(1);
+    }, [reload, active]);
 
-  return (
-    <>
-      <div className="flex-1 overflow-auto">
-        <div className="flex items-center justify-between gap-4 border-b border-zinc-700 bg-zinc-800 p-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-zinc-400" />
-            <Input 
-              placeholder="Buscar..." 
-              className="pl-8 bg-zinc-700 border-zinc-600" 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="gap-2">
-                <Filter className="h-4 w-4" />
-                <span>Filtros</span>
-              </Button>
-            </DropdownMenuTrigger>
+    function handleSubmit(e: React.FormEvent) {
+        e.preventDefault();
+        fetchCostCenters(1);
+    }
 
-            {/* <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>Filtrar por</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuCheckboxItem
-                checked={}
-                onCheckedChange={(checked) =>
-                  setFilterOptions((prev) => ({ ...prev, active: checked }))
-                }
-              >
-                Ativos
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={filterOptions.inactive}
-                onCheckedChange={(checked) =>
-                  setFilterOptions((prev) => ({ ...prev, inactive: checked }))
-                }
-              >
-                Inativos
-              </DropdownMenuCheckboxItem>
-            </DropdownMenuContent> */}
-          </DropdownMenu>
-        </div>
+    return (
+        <>
+            <div className="flex-1 overflow-auto">
+                <form onSubmit={handleSubmit}>
+                    <div className="flex items-center justify-between gap-4 border-b border-zinc-700 bg-zinc-800 p-4">
+                        <div className="relative flex-1">
+                            <Search className="absolute left-2 top-2.5 h-4 w-4 text-zinc-400" />
+                            <Input
+                                placeholder="Buscar..."
+                                className="pl-8 bg-zinc-700 border-zinc-600"
+                                value={q}
+                                onChange={(e) => setQ(e.target.value)} 
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        e.preventDefault(); 
+                                        handleSubmit(e); 
+                                    }
+                                }}
+                            />
+                        </div>
+                        <CreationDialog dtoList={dtoList.dtos} currentLabel={activeItem} />
 
-        <div className="p-4">
-          <TableComponent 
-            data={data ? data.payload.items : []} // Acesse os itens corretamente
-            columnHeaders={['Código', 'Descrição', 'Criado em', 'Atualizado em', 'Ativo']} 
-          />
-        </div>
-        <Pagination data={data} onPageChange={fetchCostCenters}/>
-      </div>
-      <Toaster />
-    </>
-  );
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" className="gap-2">
+                                    <Filter className="h-4 w-4" />
+                                    <span>Filtros</span>
+                                </Button>
+                            </DropdownMenuTrigger>
+
+                            <DropdownMenuContent align="end" className="w-56">
+                                <DropdownMenuLabel>Filtrar por</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuCheckboxItem
+                                    checked={active === true}
+                                    onCheckedChange={(checked) => {
+                                        setActive(checked ? true : undefined); 
+                                    }}
+                                >
+                                    Ativos
+                                </DropdownMenuCheckboxItem>
+                                <DropdownMenuCheckboxItem
+                                    checked={active === false}
+                                    onCheckedChange={(checked) => {
+                                        setActive(checked ? false : undefined); 
+                                    }}
+                                >
+                                    Inativos
+                                </DropdownMenuCheckboxItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                </form>
+
+                <div className="p-4">
+                    <TableComponent
+                        resource="cost-centers"
+                        data={data}
+                        columnHeaders={[
+                            "Código",
+                            "Descrição",
+                            "Criado em",
+                            "Atualizado em",
+                            "Ativo",
+                        ]}
+                        onPageChange={fetchCostCenters}
+                    />
+                </div>
+            </div>
+            <Toaster />
+        </>
+    );
 }

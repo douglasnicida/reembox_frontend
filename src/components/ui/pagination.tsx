@@ -7,7 +7,7 @@ const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
   <nav
     role="navigation"
     aria-label="pagination"
-    className={cn("mx-auto flex w-[90%] justify-end", className)}
+    className={cn("", className)}
     {...props}
   />
 )
