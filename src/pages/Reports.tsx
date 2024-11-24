@@ -30,6 +30,7 @@ export default function ReportsPage() {
     const [isByCreator, setIsByCreator] = React.useState<boolean>(false);
     const [header, setHeader] = React.useState<string[]>(['ID', 'Nome', 'Objetivo', 'Total', 'Criador', 'Aprovador', 'Criado em', 'Atualizado em', 'Status']);
     const [selectedItems, setSelectedItems] = React.useState<number[]>([]);
+    const [actionFinish, setActionFinish] = React.useState<boolean>(false);
 
     async function fetchReports(page: number, size: number = 10) {
       const endpoint = (isByCreator) ? '/reports/findAllByCreator' : '/reports';
@@ -82,11 +83,9 @@ export default function ReportsPage() {
 
     // Função para lidar com a ação do botão
     const handleButtonClick = async () => {
-      console.log("Itens selecionados:", selectedItems);
-      
       selectedItems.forEach(async (item) => {
-        const { data } = await api.get(`/reports/${item}`);
-        const currentReport = data.payload;
+        const response = await api.get(`/reports/${item}`);
+        const currentReport = response.data.payload;
 
         if(currentReport.expenses.length > 0) {
           if(currentReport.status == "OPEN") {
@@ -96,6 +95,8 @@ export default function ReportsPage() {
               description: 'Relatório submetido com sucesso!',
               variant: 'default'
             })
+            setIsByCreator(!isByCreator)
+            setActionFinish(!actionFinish)
           } else {
             if(currentReport.status == "REJECTED") {
               await api.patch(`/reports/reopen/${currentReport.id}`)
@@ -104,6 +105,8 @@ export default function ReportsPage() {
                 description: 'Relatório reaberto com sucesso!',
                 variant: 'default'
               })
+              setIsByCreator(!isByCreator)
+              setActionFinish(!actionFinish)
             } else {
               toast({
                 title: "Inválido",
@@ -147,7 +150,8 @@ export default function ReportsPage() {
               data={data}
               columnHeaders={header}
               onPageChange={fetchReports}
-              onSelectionChange={handleSelectionChange} // Passa a função de seleção para o componente da tabela
+              onSelectionChange={handleSelectionChange}
+              actionFinish={actionFinish}
             />
           </div>
 

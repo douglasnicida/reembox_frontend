@@ -16,12 +16,13 @@ export interface TableProps<T> {
   resource?: string;
   data: Paginated<T>;
   columnHeaders: string[];
+  actionFinish?: boolean;
   onPageChange: (page: number) => void;
-  onSelectionChange?: (selectedIds: number[]) => void; // Nova propriedade
+  onSelectionChange?: (selectedIds: number[]) => void;
 }
 
 export default function TableComponent<T extends Record<string, any>>(
-  { resource, data, columnHeaders, onPageChange, onSelectionChange }: TableProps<T>
+  { resource, data, columnHeaders, onPageChange, onSelectionChange, actionFinish }: TableProps<T>
 ) {
   const [items, setItems] = React.useState(data.items);
   const [selectedItems, setSelectedItems] = React.useState<number[]>([]); // Armazena os IDs dos itens selecionados
@@ -29,6 +30,10 @@ export default function TableComponent<T extends Record<string, any>>(
   React.useEffect(() => {
     setItems(data.items);
   }, [data.items]);
+
+  React.useEffect(() => {
+    setSelectedItems([])
+  }, [actionFinish])
 
   React.useEffect(() => {
     if (onSelectionChange) {
