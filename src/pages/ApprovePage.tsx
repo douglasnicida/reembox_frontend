@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { errorHandler } from "@/utils/errorHandler";
 import { handleFormatDate } from "@/utils/handleDate";
 import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
-import { Search } from "lucide-react";
+import { LoaderPinwheel, Search } from "lucide-react";
 import React from "react";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
@@ -112,6 +112,7 @@ function ApprovalReportCard({report, navigate}: ApprovalReportCardProps) {
 export default function ApprovePage() {
     const [q, setQ] = React.useState("");
     const [data, setData] = React.useState<any[]>([]);
+    const [loading, setLoading] = React.useState(true);
   
     const navigate = useNavigate()
   
@@ -137,6 +138,7 @@ export default function ApprovePage() {
                 status: report.status,
               }];
             }
+
             return prev;
           });
         })
@@ -146,7 +148,13 @@ export default function ApprovePage() {
     }
   
     React.useEffect(() => {
-        fetchReportsToApprove();
+      async function onRender() {
+        setLoading(true)
+        await fetchReportsToApprove();
+        setLoading(false)
+      }
+
+      onRender()
     }, []);
 
     return (
@@ -168,11 +176,11 @@ export default function ApprovePage() {
           <div className="p-9 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 overflow-y-scroll w-fit mx-auto">
             
             {
-              data && data.length > 0 ? data.map((report: any) => {
+              !loading ? data.map((report: any) => {
                 return(
                   <ApprovalReportCard key={report.id + Math.floor(Math.random() * 100)} report={report} navigate={navigate}/>
                 )
-              }) : <p>Nenhum relatório para aprovar no momento</p>
+              }) : (data.length == 0 && !loading) ? <p>Nenhum relatório para aprovar no momento</p> : <LoaderPinwheel className="animate-spin" />
             }
 
           </div>

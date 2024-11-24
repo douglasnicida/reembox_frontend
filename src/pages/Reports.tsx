@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import api from "@/api/axios";
 import TableComponent from "@/components/custom_components/TableComponent";
 import { Button } from "@/components/ui/button";
@@ -92,15 +93,24 @@ export default function ReportsPage() {
             await api.patch(`/reports/submit/${currentReport.id}`)
             toast({
               title: "Sucesso",
-              description: 'Relatórios submetidos com sucesso!',
+              description: 'Relatório submetido com sucesso!',
               variant: 'default'
             })
           } else {
-            toast({
-              title: "Inválido",
-              description: `Relatório ${currentReport.name} já foi submetido anteriormente!`,
-              variant: 'destructive'
-            })
+            if(currentReport.status == "REJECTED") {
+              await api.patch(`/reports/reopen/${currentReport.id}`)
+              toast({
+                title: "Sucesso",
+                description: 'Relatório reaberto com sucesso!',
+                variant: 'default'
+              })
+            } else {
+              toast({
+                title: "Inválido",
+                description: `Relatório ${currentReport.name} já foi submetido anteriormente!`,
+                variant: 'destructive'
+              })
+            }
           }
         } else {
           toast({
@@ -145,7 +155,7 @@ export default function ReportsPage() {
           {selectedItems.length > 0 && isByCreator && (
             <div className="p-4 w-full flex justify-items-end items-end">
               <Button variant="default" onClick={handleButtonClick}>
-                Submeter itens selecionados
+                Submeter/reabrir itens selecionados
               </Button>
             </div>
           )}
