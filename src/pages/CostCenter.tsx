@@ -20,12 +20,17 @@ import { useActiveItem } from "@/context/ActiveItemContext";
 import { Paginated, PaginatedResponse } from "@/types/response.type";
 import CreationDialog from "@/components/custom_components/CreationDialog";
 import { dtoList } from "@/lib/utils";
+import {useState} from "react";
+import UpdateDialog from "@/components/custom_components/UpdateDialog.tsx";
+import {dtoUpdateList} from "@/lib/utilsUpdate.ts";
 
 export default function CostCenterPage() {
     const { reload, activeItem } = useActiveItem()
 
     const [q, setQ] = React.useState<string>("");
     const [active, setActive] = React.useState<boolean | undefined>(undefined);
+    const [editId, setEditId] = useState<number | null>(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [data, setData] = React.useState<Paginated<CostCenter>>({
         items: [],
         totalItems: 0,
@@ -33,6 +38,14 @@ export default function CostCenterPage() {
         currentPage: 1,
         size: 10,
     });
+    const handleOpenEditModal = (id: number) => {
+        setEditId(id);
+        setIsEditModalOpen(true);
+    };
+    const handleCloseEditModal = () => {
+        setEditId(null);
+        setIsEditModalOpen(false);
+    };
 
     async function fetchCostCenters(page: number, size: number = 10) {
         try {
@@ -61,7 +74,6 @@ export default function CostCenterPage() {
         e.preventDefault();
         fetchCostCenters(1);
     }
-
     return (
         <>
             <div className="flex-1 overflow-auto">
@@ -128,9 +140,21 @@ export default function CostCenterPage() {
                             "Ativo",
                         ]}
                         onPageChange={fetchCostCenters}
+                        onEdit={handleOpenEditModal}
                     />
                 </div>
             </div>
+
+            {isEditModalOpen && (
+                <UpdateDialog
+                    dtoList={dtoUpdateList.dtos}
+                    currentLabel="Centros de Custo"
+                    editId={editId}
+                    isOpen={isEditModalOpen}
+                    onClose={handleCloseEditModal}
+                />
+            )}
+
             <Toaster />
         </>
     );

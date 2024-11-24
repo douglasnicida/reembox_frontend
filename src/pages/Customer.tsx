@@ -17,16 +17,17 @@ import { Toaster } from "@/components/ui/toaster";
 import { errorHandler } from "@/utils/errorHandler";
 
 import api from "@/api/axios";
-import { Paginated, PaginatedResponse } from "@/types/response.type";
+import { Paginated, PaginatedResponse, Response } from "@/types/response.type";
 import CreationDialog from "@/components/custom_components/CreationDialog";
 import { dtoList } from "@/lib/utils";
+import { dtoUpdateList } from "@/lib/utilsUpdate";
 import { useActiveItem } from "@/context/ActiveItemContext";
+import UpdateDialog from "@/components/custom_components/UpdateDialog";
 import ApprovalRAGDialog from "./ApprovalRAGDialog";
 
 export default function CustomerPage() {
   const [q, setQ] = useState<string>("");
   const [active, setActive] = useState<boolean | undefined>(undefined);
-  const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
   const [data, setData] = useState<Paginated<Customer>>({
     items: [],
     totalItems: 0,
@@ -34,7 +35,12 @@ export default function CustomerPage() {
     currentPage: 1,
     size: 10,
   });
+  const [rags, setRags] = useState<Response<any>>([])
+  const [editId, setEditId] = useState<number | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { activeItem } = useActiveItem();
+
+  const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
 
   async function fetchCustomers(page: number, size: number = 10) {
     try {
@@ -57,8 +63,19 @@ export default function CustomerPage() {
     }
   }
 
+  async function fetchRags() {
+    try {
+      const { data } = await api.get<Response<any>>("/rag");
+
+      setRags(data);
+    } catch (err: any) {
+      errorHandler(err);
+    }
+  }
+
   useEffect(() => {
     fetchCustomers(1);
+    fetchRags();
   }, [active]);
 
   function handleSubmit(e: React.FormEvent) {
@@ -66,19 +83,34 @@ export default function CustomerPage() {
     fetchCustomers(1);
   }
 
+  const handleOpenEditModal = (id: number) => {
+    setEditId(id);
+    setIsEditModalOpen(true);
+  };
+  
+  const handleCloseEditModal = () => {
+    setEditId(null);
+    setIsEditModalOpen(false);
+  };
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const renderCustomActions = (item: Customer) => (
-      <>
-      <DropdownMenuItem onClick={() => {
-          setSelectedCustomerId(item.id);
-          setIsDialogOpen(true);
-        }}>
-        Aprovar RAG
-      </DropdownMenuItem>
-    </>
-  );
-
+  const renderCustomActions = (item: Customer) => {
+    console.log(rags);
+    
+    if (!rags.payload.find((r: any) => r.customerId === item.id)) {
+      return (
+        <>
+          <DropdownMenuItem onClick={() => {
+              setSelectedCustomerId(item.id);
+              setIsDialogOpen(true);
+            }}>
+            Aprovar RAG
+          </DropdownMenuItem>
+        </>
+      )
+    }
+  }
 
   return (
     <>
@@ -100,7 +132,6 @@ export default function CustomerPage() {
                 }}
               />
             </div>
-
             <CreationDialog dtoList={dtoList.dtos} currentLabel={activeItem} />
             
             <DropdownMenu>
@@ -141,17 +172,27 @@ export default function CustomerPage() {
             data={data}
             columnHeaders={['Nome', 'Telefone', 'E-mail', 'Criado em', 'Atualizado em', 'Ativo' ]} 
             onPageChange={fetchCustomers}
+            onEdit={handleOpenEditModal}
             customActions={renderCustomActions}
           />
         </div>
       </div>
+      {isEditModalOpen && (
+          <UpdateDialog
+              dtoList={dtoUpdateList.dtos}
+              currentLabel="Clientes"
+              editId={editId}
+              isOpen={isEditModalOpen}
+              onClose={handleCloseEditModal}
+          />
+      )}
 
       <ApprovalRAGDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         customerId={selectedCustomerId}
       />
-      
+
       <Toaster />
     </>
   );

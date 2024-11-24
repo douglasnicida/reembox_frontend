@@ -207,6 +207,9 @@ export default function Sidebar() {
                     const sidebar = [];
                     section.items.forEach((item: any) => {
                         if (item.roles.includes(role) || item.roles.length === 0) {
+                            if (item.path === "/context" && !user?.rag.folderId) {
+                                return
+                            }
                             sidebar.push(
                                 <SidebarItem key={item.label} Icon={item.Icon} label={item.label} active={activeItem === item.label} onClick={() => handleItemClick(item.label, item.path)} />
                             );

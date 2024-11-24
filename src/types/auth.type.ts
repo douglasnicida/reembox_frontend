@@ -2,6 +2,12 @@ type TokenType = {
     username: string;
     name: string;
     company: string;
+    rag: {
+        id: number;
+        folderId: number;
+        llmModel: string;
+        embeddingModel: string;
+    };
 }
 
 type LoginType = {

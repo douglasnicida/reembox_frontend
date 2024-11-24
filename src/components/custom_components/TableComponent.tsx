@@ -19,10 +19,11 @@ export interface TableProps<T> {
   onPageChange: (page: number) => void;
   onSelectionChange?: (selectedIds: number[]) => void;
   customActions?: (item: T) => React.ReactNode;
+  onEdit: (id: number) => void;
 }
 
 export default function TableComponent<T extends Record<string, any>>(
-  { resource, data, columnHeaders, onPageChange, onSelectionChange, customActions }: TableProps<T>
+  { resource, data, columnHeaders, onPageChange, onSelectionChange, customActions, onEdit }: TableProps<T>
 ) {
   const [items, setItems] = React.useState(data.items);
   const [selectedItems, setSelectedItems] = React.useState<number[]>([]); // Armazena os IDs dos itens selecionados
@@ -124,7 +125,7 @@ export default function TableComponent<T extends Record<string, any>>(
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       {customActions && customActions(item)}
-                      <DropdownMenuItem>Editar</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onEdit(item.id)}>Editar</DropdownMenuItem>
                       <DropdownMenuItem>Excluir</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

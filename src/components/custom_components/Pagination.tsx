@@ -13,9 +13,10 @@ import { Paginated } from "@/types/response.type";
 type PaginationProps<T> = {
   data: Paginated<T>;
   onPageChange: (page: number) => void;
+  labelNumElements?: boolean
 };
 
-export function Pagination<T>({ data, onPageChange }: PaginationProps<T>) {
+export function Pagination<T>({ data, onPageChange, labelNumElements = true }: PaginationProps<T>) {
   const { totalPages, currentPage } = data;
   const [activePage, setActivePage] = useState(currentPage);
 
@@ -28,9 +29,11 @@ export function Pagination<T>({ data, onPageChange }: PaginationProps<T>) {
 
   return (
     <div className="flex items-center justify-between">
-    <span className="text-sm font-medium text-sidebar-foreground/70">
-      Foram encontrados {data.totalItems} registros
-    </span>
+    {labelNumElements && (
+      <span className="text-sm font-medium text-sidebar-foreground/70">
+        Foram encontrados {data.totalItems} registros
+      </span>
+    )}
     <UiPagination className="mr-2">
         <PaginationContent>
           <PaginationItem>

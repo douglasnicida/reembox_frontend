@@ -103,7 +103,7 @@ export const dtoList = {
             apiReqKey: "phone"
           }
         ], 
-        req: '/customer/'
+        req: '/customers/'
       },
       "create-expense-category": {
         description:"Preencha os campos abaixo para criar uma categoria de despesa.",

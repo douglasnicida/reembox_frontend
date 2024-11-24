@@ -61,13 +61,13 @@ export type ReportTableItem = {
     status: ReportStatus
 }
 
-export interface UserWithCompanyName {
+export interface User {
     id: number,
     name: string,
     company: { 
         id: number,
         name: string 
-    }
+    },
 }
 
 export type ReportParam = {

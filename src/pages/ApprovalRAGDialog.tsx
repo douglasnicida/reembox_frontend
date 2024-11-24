@@ -4,19 +4,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { Input } from "@/components/ui/input";
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import api from "@/api/axios";
 import { toast } from "@/hooks/use-toast";
 import { errorHandler } from "@/utils/errorHandler";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
+import { SelectValue } from "@radix-ui/react-select";
 
 // Definição do schema Zod para validação
 const approvalRagSchema = z.object({
   remarks: z.string().optional(),
-  modelInfo: z
+  llmModel: z
+    .string(),
+  embeddingModel: z
     .string()
-    .min(3, "O campo deve conter pelo menos 3 caracteres")
-    .max(255, "O campo não pode ter mais que 255 caracteres")
 });
 
 // Tipagem derivada do schema Zod
@@ -28,12 +30,24 @@ interface ApprovalRAGDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
+const llmModels = [
+  "llama3.1:8b",
+  "llama3.1:70b",
+  "gpt-4"
+]
+
+const embeddingModels = [
+  "ollama::nomic-embed-text",
+  "openai::text-embedding-ada-002"
+]
+
 function ApprovalRAGDialog({ customerId, open, onOpenChange }: ApprovalRAGDialogProps) {
   const form = useForm<ApprovalRagFormValues>({
     resolver: zodResolver(approvalRagSchema),
     defaultValues: {
       remarks: "",
-      modelInfo: "",
+      llmModel: "",
+      embeddingModel: "",
     },
   });
 
@@ -66,13 +80,57 @@ function ApprovalRAGDialog({ customerId, open, onOpenChange }: ApprovalRAGDialog
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="modelInfo"
+              name="llmModel"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Modelo <span className="text-red-500">*</span></FormLabel>
-                  <FormControl>
-                    <Input placeholder="Informe o modelo" {...field} />
-                  </FormControl>
+                  <FormLabel>Modelo de Treinamento<span className="text-red-500">*</span></FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="bg-zinc-700 border-zinc-600 text-zinc-300">
+                        <SelectValue placeholder="Selecione um modelo de treinamento" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="bg-zinc-700 border-zinc-600">
+                      {llmModels.map((llm, idx) => (
+                        <SelectItem 
+                          key={idx} 
+                          value={llm}
+                          className="text-white hover:bg-zinc-600"
+                        >
+                          {llm}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="embeddingModel"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Modelo de Embedding<span className="text-red-500">*</span></FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="bg-zinc-700 border-zinc-600 text-zinc-300">
+                        <SelectValue placeholder="Selecione um modelo de embedding" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="bg-zinc-700 border-zinc-600">
+                      {embeddingModels.map((embedding, idx) => (
+                        <SelectItem 
+                          key={idx} 
+                          value={embedding}
+                          className="text-white hover:bg-zinc-600"
+                        >
+                          {embedding}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                    </Select>
                   <FormMessage />
                 </FormItem>
               )}

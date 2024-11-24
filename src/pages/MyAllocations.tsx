@@ -46,66 +46,67 @@ export default function MyAllocationsPage() {
     }
   }
 
+  console.log(data);
+  
+
   useEffect(() => {
     fetchAllocations(1);
   }, []);
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    fetchAllocations(1);
-  }
-
   return (
-    <>
-    <div className="flex items-center justify-center gap-4 mt-6">
-      {data.items.map(allocation => (
-        <Card key={allocation.id}>
-          <CardHeader>
-            <CardTitle>{allocation.project.key}</CardTitle>
-            <CardDescription>{allocation.project.name}</CardDescription>
-            <CardDescription>
-              <p>Início: {allocation.startDate}</p>
-              <p>
-                {!allocation.endDate ? 
-                  `Término estimado ${allocation.estimatedEndDate}` :
-                  `Término: ${allocation.endDate}`
-                }
-              </p>
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Collapsible
-              open={isOpen}
-              onOpenChange={setIsOpen}
-              className="w-[350px] space-y-2"
-            >
-              <div className="flex items-center justify-between space-x-4 px-4">
-                <h4 className="text-sm font-semibold">
-                  Expanda para ver toda a equipe
-                </h4>
-                <CollapsibleTrigger asChild>
-                  <Button variant="ghost" size="sm">
-                    <ChevronsUpDown className="h-4 w-4" />
-                  </Button>
-                </CollapsibleTrigger>
-              </div>
-              <div className="rounded-md border px-4 py-2 font-mono text-sm shadow-sm">
-                  {allocation.allocations[0].name}, {allocation.allocations[0].jobTitle || "Sem cargo"}
-              </div>
-              {allocation.allocations.map(alloc => (
-                  <CollapsibleContent key={alloc.id} lassName="space-y-2">
-                      <div className="rounded-md border px-4 py-2 font-mono text-sm shadow-sm">
-                        {alloc.name}, {alloc.jobTitle || "Sem cargo"}
-                      </div>
-                  </CollapsibleContent>
-                ))}
-            </Collapsible>       
-          </CardContent>
-        </Card>
-      ))}
+    <div className="h-[90%] flex flex-col border">
+      <div className="flex items-center justify-center gap-4 mt-6">
+        {data.items.map(allocation => (
+          <Card key={allocation.id}>
+            <CardHeader>
+              <CardTitle>{allocation.project.key}</CardTitle>
+              <CardDescription>{allocation.project.name}</CardDescription>
+              <CardDescription>
+                <p>Início: {allocation.startDate}</p>
+                <p>
+                  {!allocation.endDate ? 
+                    `Término estimado ${allocation.estimatedEndDate}` :
+                    `Término: ${allocation.endDate}`
+                  }
+                </p>
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Collapsible
+                open={isOpen}
+                onOpenChange={setIsOpen}
+                className="w-[350px] space-y-2"
+              >
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-semibold">
+                    Expanda para ver toda a equipe
+                  </h4>
+                  <CollapsibleTrigger asChild>
+                    <Button variant="ghost" size="sm">
+                      <ChevronsUpDown className="h-4 w-4" />
+                    </Button>
+                  </CollapsibleTrigger>
+                </div>
+                <div className="rounded-md border px-4 py-2 font-mono text-sm shadow-sm">
+                    {allocation.allocations[0].name}, {allocation.allocations[0].jobTitle || "Sem cargo"}
+                </div>
+                {allocation.allocations.slice(1).map((alloc) => 
+                    <CollapsibleContent key={alloc.id} className="space-y-2">
+                        <div className="rounded-md border px-4 py-2 font-mono text-sm shadow-sm">
+                          {alloc.name}, {alloc.jobTitle || "Sem cargo"}
+                        </div>
+                    </CollapsibleContent>
+                  )}
+              </Collapsible>       
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      <Toaster />
+      
+      <div className="self-end">
+        <Pagination data={data} onPageChange={fetchAllocations} labelNumElements={false}/>
+      </div>
     </div>
-    <Toaster />
-    <Pagination data={data} onPageChange={fetchAllocations}/>
-    </>
   );
 }
