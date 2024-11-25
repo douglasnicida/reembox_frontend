@@ -42,80 +42,82 @@ interface VerifyAndApproveDialogProps {
   currentReport: any;
 }
 
-function VerifyAndApproveDialog({ reportStatus, currentReport }: VerifyAndApproveDialogProps) {
-  
-  async function handleApproval(approvedStatus: boolean) {
-    const endpoint = (approvedStatus === true) ? `/reports/manager/approve/${currentReport.id}` : `/reports/approver/reject/${currentReport.id}`
-
-    try {
-      const response = await api.patch(endpoint)
-      toast({
-        title: 'Sucesso!',
-        description: response.data.message,
-      });
-    } catch(e: any) {
-      toast({
-        title: 'Erro ao aprovar!',
-        description: e.message,
-        variant: 'destructive'
-      });
-    }
-  }
-
-  return (
-    <div className="absolute right-5 bottom-0">
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button className={`${reportStatus} cursor-pointer`}>{currentReport.status}</Button>
-        </AlertDialogTrigger>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Deseja aprovar ou rejeitar este relatório?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Essa ação não poderá ser desfeita a partir do momento em que for aprovado.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={() => {handleApproval(false)}}>Rejeitar</AlertDialogAction>
-            <AlertDialogAction onClick={() => {handleApproval(true)}}>Aprovar</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
-  )
-}
-
-function ApprovalReportCard({report, navigate}: ApprovalReportCardProps) {
-  const currentReport = report;
-  const reportStatus = statusColors[currentReport.status];
-
-  return (
-    <Card className="w-[340px] h-[240px] relative">
-      <OpenInNewWindowIcon className="h-5 w-5 absolute top-3 right-3 hover:scale-110 cursor-pointer" onClick={() => {navigate(`/reports/${currentReport.id}/details`);}} />
-      <CardHeader>
-        <CardTitle>{currentReport.name}</CardTitle>
-        <CardDescription>{currentReport.goal}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-y-2 text-sm relative h-auto">
-        <p>Criador do relatório: {currentReport.creator}</p>
-        <p>Data de criação: {handleFormatDate(currentReport.createdAt)}</p>
-        <p>Total: <span>R$</span>{currentReport.total}</p>
-      </CardContent>
-      <CardFooter className="relative">
-        <VerifyAndApproveDialog currentReport={currentReport} reportStatus={reportStatus} />
-      </CardFooter>
-    </Card>
-  )
-}
 
 export default function ApprovePage() {
-    const [q, setQ] = React.useState("");
-    const [data, setData] = React.useState<any[]>([]);
-    const [loading, setLoading] = React.useState(true);
+  const [q, setQ] = React.useState("");
+  const [data, setData] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
   
-    const navigate = useNavigate()
+  const navigate = useNavigate()
   
+    function VerifyAndApproveDialog({ reportStatus, currentReport }: VerifyAndApproveDialogProps) {
+      
+      async function handleApproval(approvedStatus: boolean) {
+        const endpoint = (approvedStatus === true) ? `/reports/manager/approve/${currentReport.id}` : `/reports/approver/reject/${currentReport.id}`
+    
+        try {
+          const response = await api.patch(endpoint)
+          toast({
+            title: 'Sucesso!',
+            description: response.data.message,
+          });
+          setData((prev: any[]) => prev.filter((item: any) => item.id != currentReport.id))
+        } catch(e: any) {
+          toast({
+            title: 'Erro ao aprovar!',
+            description: e.message,
+            variant: 'destructive'
+          });
+        }
+      }
+    
+      return (
+        <div className="absolute right-5 bottom-0">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button className={`${reportStatus} cursor-pointer`}>{currentReport.status}</Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Deseja aprovar ou rejeitar este relatório?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Essa ação não poderá ser desfeita a partir do momento em que for aprovado.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={() => {handleApproval(false)}}>Rejeitar</AlertDialogAction>
+                <AlertDialogAction onClick={() => {handleApproval(true)}}>Aprovar</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      )
+    }
+    
+    function ApprovalReportCard({report, navigate}: ApprovalReportCardProps) {
+      const currentReport = report;
+      const reportStatus = statusColors[currentReport.status];
+    
+      return (
+        <Card className="w-[340px] h-[240px] relative">
+          <OpenInNewWindowIcon className="h-5 w-5 absolute top-3 right-3 hover:scale-110 cursor-pointer" onClick={() => {navigate(`/reports/${currentReport.id}/details`);}} />
+          <CardHeader>
+            <CardTitle>{currentReport.name}</CardTitle>
+            <CardDescription>{currentReport.goal}</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-y-2 text-sm relative h-auto">
+            <p>Criador do relatório: {currentReport.creator}</p>
+            <p>Data de criação: {handleFormatDate(currentReport.createdAt)}</p>
+            <p>Total: <span>R$</span>{currentReport.total}</p>
+          </CardContent>
+          <CardFooter className="relative">
+            <VerifyAndApproveDialog currentReport={currentReport} reportStatus={reportStatus} />
+          </CardFooter>
+        </Card>
+      )
+    }
+
     async function fetchReportsToApprove() {
       try {
         //pegar todos os relatórios que ainda não foram aprovados se você for o aprovador dela
@@ -176,11 +178,14 @@ export default function ApprovePage() {
           <div className="p-9 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 overflow-y-scroll w-fit mx-auto">
             
             {
-              !loading ? data.map((report: any) => {
+              loading ? <LoaderPinwheel className="animate-spin" />
+              :
+              (data.length == 0) ? <p>Não há relatórios para serem aprovados no momento.</p> :
+              data.map((report: any) => {
                 return(
                   <ApprovalReportCard key={report.id + Math.floor(Math.random() * 100)} report={report} navigate={navigate}/>
                 )
-              }) : (data.length == 0 && !loading) ? <p>Nenhum relatório para aprovar no momento</p> : <LoaderPinwheel className="animate-spin" />
+              })
             }
 
           </div>

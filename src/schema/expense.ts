@@ -35,9 +35,8 @@ export const ExpenseFormSchema = z.object({
   })
     .int("Valor deve ser um número inteiro").positive("Valor deve ser um número positivo"),
   notes: z
-    .string({required_error: "Mínimo de uma e máximo de 4 palavras para anotações"})
-    .min(2)
-    .max(25, "Número de caracteres máximo atingido"),
+    .string()
+    .optional(),
   reportCode: z.string().optional(),
   costCenterId: z
     .number({

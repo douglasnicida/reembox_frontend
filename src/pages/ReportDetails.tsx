@@ -19,7 +19,8 @@ const ReportDetailsPage = () => {
             const { data } = await api.get(`/reports/${id}`);
             setReport(data.payload)
 
-            // TODO: pegar recibos de cada despesa para visualizar nos detalhes, e nessa tela poderá adicionar mais despesas 
+            // TODO: pegar recibos de cada despesa para visualizar nos detalhes, e nessa tela poderá adicionar
+            // mais despesas 
             //(criar outra tela cópia da tabela despesas com checkbox na primeira coluna)
             data.payload.expenses.forEach(async (expense: any) => {
                 const currentExpense = expense.expense;

@@ -127,11 +127,15 @@ export default function CreateExpensePage() {
         receiptIDs.push(data.payload)
       })
 
-      // criando despesa
-      const expenseID = await api.post('expenses', {
+      const newExpense = {
         ...rest,
         expenseDate: expense.expenseDate.toISOString()        
-      })
+      }
+
+      console.log(newExpense)
+
+      // criando despesa
+      const expenseID = await api.post('expenses', newExpense)
 
       // atribuindo aos recibos o ID da despesa
       receiptIDs.forEach(async (id: number) => {
@@ -303,7 +307,7 @@ export default function CreateExpensePage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-white">Relatório</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
                           <FormControl>
                             <SelectTrigger className="bg-zinc-700 border-zinc-600 text-zinc-300">
                               <SelectValue placeholder="Selecione um relatório" />
