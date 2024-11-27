@@ -303,7 +303,7 @@ export default function CreateExpensePage() {
                   {/* Relatório */}
                   <FormField
                     control={form.control}
-                    name="reportCode"
+                    name="reportId"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-white">Relatório</FormLabel>
