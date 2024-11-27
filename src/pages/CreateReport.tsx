@@ -94,7 +94,7 @@ export default function CreateReportPage() {
   const form = useForm<z.infer<typeof ReportFormSchema>>({
     resolver: zodResolver(ReportFormSchema),
     defaultValues: {
-      name: "RPT-",
+      name: "",
       goal: "",
       expenseIDs: [],
     },

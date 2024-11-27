@@ -21,6 +21,7 @@ import CreateAllocationPage from './pages/CreateAllocation';
 import MyAllocationsPage from './pages/MyAllocations';
 import ContextPage from './pages/Context';
 import FinancialPage from './pages/FinancialPage';
+import ReportDetailsPage from './pages/ReportDetails';
 
 export default function AppRoute() {
     const { activeItem, setActiveItem } = useActiveItem();
@@ -56,6 +57,7 @@ export default function AppRoute() {
                         <Route path="/allocations" element={<AllocationPage/>}/>
                         <Route path="/financial" element={<FinancialPage/>}/>
                         <Route path="/approval" element={<ApprovePage/>}/>
+                        <Route path="/reports/:id/details" element={<ReportDetailsPage/>}/>
                         <Route path="/expense/new" element={<CreateExpensePage/>}/>
                         <Route path="/reports/new" element={<CreateReportPage/>}/>
                         <Route path="/allocations/new" element={<CreateAllocationPage/>}/>

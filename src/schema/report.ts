@@ -4,7 +4,6 @@ const name = z
  .string({
     required_error: "Nome é obrigatório.",
  })
- .startsWith('RPT-', "O nome do relatório deve começar com RPT-")
  .min(6, "O nome deve ter pelo menos 6 caracteres.")
 
  const goal = z
