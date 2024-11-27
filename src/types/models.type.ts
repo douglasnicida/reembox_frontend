@@ -156,16 +156,60 @@ export type ExpenseTableItem = {
     categoryDescription: string
 }
 
-export type ExpenseParam = {
+export type Param = {
     id: number;
     param: string;
   }
 
 export type ExpenseParams = {
-    costCenters: ExpenseParam[];
-    projects: ExpenseParam[]
-    categories: ExpenseParam[];
-    reports: ExpenseParam[];
+    costCenters: Param[];
+    projects: Param[]
+    categories: Param[];
+    reports: Param[];
+}
+
+export type AllocationParams = {
+    projects: Param[]
+    users: Param[]
+}
+
+export type Allocation = {
+    id: number,
+    startDate: string,
+    endDate: string,
+    estimatedEndDate: string,
+    project: {
+        key: string,
+        name: string
+    }
+    user: {
+        id: number,
+        name: string,
+        jobTitle: {
+            title: string,
+        },
+    },
+}
+
+export type MyAllocations = {
+    id: number,
+    startDate: string,
+    estimatedEndDate: string,
+    endDate: string,
+    project: {
+      name: string,
+      key: string,
+    },
+    customer: {
+      id: string,
+      name: string,
+    },
+    // Filtra os usuários que não são o próprio usuário
+    allocations: {
+        id: string,
+        name: string,
+        jobTitle: string,
+    }[]
 }
 
 export type GenericFilter = {

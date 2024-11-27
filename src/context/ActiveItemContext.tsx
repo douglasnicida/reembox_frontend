@@ -19,12 +19,15 @@ const RoutesMap: Record<string, string> = {
     "/expense-categories": "Tipos de Despesa",
     "/projects": "Projetos",
     "/customers": "Clientes",
+    "/allocations": "Alocações",
     "/financial": "Financeiro",
     "/approval": "Aprovação",
     "/config": "Configurações",
-    '/expense/new': "Nova despesa",
+    "/expense/new": "Nova despesa",
     "/reports/new": "Novo Relatório",
-    "/reports/:id/details": "Detalhes Relatório",
+    "/allocations/new": "Nova alocação",
+    "/allocations/my": "Minhas alocações",
+    "/context": "Contexto"
 }
 
 const ActiveItemContext = createContext<ActiveItemContextType | undefined>(undefined);

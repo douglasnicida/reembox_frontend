@@ -20,3 +20,13 @@ export const handleFormatDate = (value: string | Date): string => {
   // Se não for uma data válida, retorna o valor como string
   return String(value);
 };
+
+export function convertISOToDDMMYYYY(isoDateString: string) {
+  const date = new Date(isoDateString);
+
+  const day = String(date.getDate()).padStart(2, '0'); 
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+
+  return `${day}/${month}/${year}`;
+}

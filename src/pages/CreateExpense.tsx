@@ -32,7 +32,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { ExpenseParam, ExpenseParams } from "@/types/models.type"
+import { ExpenseParams, Param } from "@/types/models.type"
 import api from "@/api/axios"
 import { errorHandler } from "@/utils/errorHandler"
 import React from "react"
@@ -43,10 +43,10 @@ import { toast } from "@/hooks/use-toast"
 import { useNavigate } from "react-router-dom"
 
 export default function CreateExpensePage() {
-  const [costCenters, setCostCenters] = useState<ExpenseParam[]>([]);
-  const [projects, setProjects] = useState<ExpenseParam[]>([]);
-  const [categories, setCategories] = useState<ExpenseParam[]>([]);
-  const [reports, setReports] = useState<ExpenseParam[]>([]);
+  const [costCenters, setCostCenters] = useState<Param[]>([]);
+  const [projects, setProjects] = useState<Param[]>([]);
+  const [categories, setCategories] = useState<Param[]>([]);
+  const [reports, setReports] = useState<Param[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const navigate = useNavigate()

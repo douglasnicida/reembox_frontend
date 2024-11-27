@@ -84,7 +84,6 @@ export default function CostCenterPage() {
                         </div>
                         <CreationDialog dtoList={dtoList.dtos} currentLabel={activeItem} />
 
-
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" className="gap-2">
