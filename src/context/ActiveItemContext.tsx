@@ -46,7 +46,11 @@ export const ActiveItemProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         const location = window.location.pathname;
         
         setActiveItem('Início')
-        setActiveItem(RoutesMap[location]);
+        if(!location.includes('details')) {
+            setActiveItem(RoutesMap[location]);
+        } else {
+            setActiveItem('Detalhes')
+        }
 
 
     }, [window.location.pathname]);
