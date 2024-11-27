@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, LoaderPinwheel } from "lucide-react";
 import TableComponent from "@/components/custom_components/TableComponent";
 import { Project, ProjectTableItem } from "@/types/models.type";
 import { Toaster } from "@/components/ui/toaster";
@@ -23,6 +23,7 @@ import { useActiveItem } from "@/context/ActiveItemContext";
 
 export default function ProjectPage() {
   const [q, setQ] = useState("");
+  const [loading, setLoading] = React.useState<boolean>(true);
   const [active, setActive] = useState<boolean | undefined>(undefined);
   const [data, setData] = useState<Paginated<ProjectTableItem>>({
     items: [],
@@ -34,6 +35,7 @@ export default function ProjectPage() {
   const { activeItem } = useActiveItem();
 
   async function fetchProjects(page: number, size: number = 10) {
+    setLoading(true)
     try {
       const params: Record<string, any> = { page, size };
 
@@ -62,6 +64,7 @@ export default function ProjectPage() {
     } catch (err: any) {
       errorHandler(err);
     }
+    setLoading(false)
   }
 
   useEffect(() => {
@@ -128,12 +131,19 @@ export default function ProjectPage() {
         </form>
 
         <div className="p-4">
-          <TableComponent
-            resource="projects"
-            data={data} 
-            columnHeaders={['Código', 'Nome', 'Cliente', 'Criado em', 'Atualizado em', 'Ativo']} 
-            onPageChange={fetchProjects}
-          />
+          {
+            loading ?
+            <div className="w-full h-[calc(100vh-234px)] flex justify-center items-center">
+              <LoaderPinwheel className="animate-spin h-20 w-20" />
+            </div>
+            :
+            <TableComponent
+              resource="projects"
+              data={data} 
+              columnHeaders={['Código', 'Nome', 'Cliente', 'Criado em', 'Atualizado em', 'Ativo']} 
+              onPageChange={fetchProjects}
+            />
+          }
         </div>
       </div>
       <Toaster />

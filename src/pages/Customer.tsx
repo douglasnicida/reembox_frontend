@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, LoaderPinwheel } from "lucide-react";
 import TableComponent from "@/components/custom_components/TableComponent";
 import { Customer } from "@/types/models.type";
 import { Toaster } from "@/components/ui/toaster";
@@ -26,6 +26,7 @@ import ApprovalRAGDialog from "./ApprovalRAGDialog";
 export default function CustomerPage() {
   const [q, setQ] = useState<string>("");
   const [active, setActive] = useState<boolean | undefined>(undefined);
+  const [loading, setLoading] = React.useState<boolean>(true);
   const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
   const [data, setData] = useState<Paginated<Customer>>({
     items: [],
@@ -37,6 +38,7 @@ export default function CustomerPage() {
   const { activeItem } = useActiveItem();
 
   async function fetchCustomers(page: number, size: number = 10) {
+    setLoading(true)
     try {
       const params: Record<string, any> = { page, size };
 
@@ -55,6 +57,7 @@ export default function CustomerPage() {
     } catch (err: any) {
       errorHandler(err);
     }
+    setLoading(false)
   }
 
   useEffect(() => {
@@ -136,13 +139,20 @@ export default function CustomerPage() {
         </form>
 
         <div className="p-4">
-          <TableComponent 
-            resource="customers"
-            data={data}
-            columnHeaders={['Nome', 'Telefone', 'E-mail', 'Criado em', 'Atualizado em', 'Ativo' ]} 
-            onPageChange={fetchCustomers}
-            customActions={renderCustomActions}
-          />
+          {
+            loading ?
+            <div className="w-full h-[calc(100vh-234px)] flex justify-center items-center">
+              <LoaderPinwheel className="animate-spin h-20 w-20" />
+            </div>
+            :
+            <TableComponent 
+              resource="customers"
+              data={data}
+              columnHeaders={['Nome', 'Telefone', 'E-mail', 'Criado em', 'Atualizado em', 'Ativo' ]} 
+              onPageChange={fetchCustomers}
+              customActions={renderCustomActions}
+            />
+          }
         </div>
       </div>
 

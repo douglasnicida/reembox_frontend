@@ -10,7 +10,7 @@ import { toast } from "@/hooks/use-toast";
 import { Report, ReportTableItem } from "@/types/models.type";
 import { Paginated, PaginatedResponse } from "@/types/response.type";
 import { errorHandler } from "@/utils/errorHandler";
-import { Search } from "lucide-react";
+import { LoaderPinwheel, Search } from "lucide-react";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -31,8 +31,10 @@ export default function ReportsPage() {
     const [header, setHeader] = React.useState<string[]>(['ID', 'Nome', 'Objetivo', 'Total', 'Criador', 'Aprovador', 'Criado em', 'Atualizado em', 'Status']);
     const [selectedItems, setSelectedItems] = React.useState<number[]>([]);
     const [actionFinish, setActionFinish] = React.useState<boolean>(false);
+    const [loading, setLoading] = React.useState<boolean>(true);
 
     async function fetchReports(page: number, size: number = 10) {
+      setLoading(true)
       const endpoint = (isByCreator) ? '/reports/findAllByCreator' : '/reports';
     
       // Define o cabeçalho com base no endpoint
@@ -70,6 +72,8 @@ export default function ReportsPage() {
       } catch (err: any) {
         errorHandler(err);
       }
+
+      setLoading(false)
     }
 
     React.useEffect(() => {
@@ -145,14 +149,21 @@ export default function ReportsPage() {
           </div>
 
           <div className="p-4">
-            <TableComponent 
-              resource="reports"
-              data={data}
-              columnHeaders={header}
-              onPageChange={fetchReports}
-              onSelectionChange={handleSelectionChange}
-              actionFinish={actionFinish}
-            />
+            {
+              loading ?
+              <div className="w-full h-[calc(100vh-234px)] flex justify-center items-center">
+                <LoaderPinwheel className="animate-spin h-20 w-20" />
+              </div> 
+              :
+              <TableComponent 
+                resource="reports"
+                data={data}
+                columnHeaders={header}
+                onPageChange={fetchReports}
+                onSelectionChange={handleSelectionChange}
+                actionFinish={actionFinish}
+              />
+            }
           </div>
 
           {/* Botão que aparece somente se houver itens selecionados */}

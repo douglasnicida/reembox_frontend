@@ -22,6 +22,7 @@ import { NavigateFunction, useNavigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { toast } from "@/hooks/use-toast";
 import { translateStatus } from "@/utils/handleStatus";
+import EmptyTable from "@/components/custom_components/EmptyTable";
 
 const statusColors: { [key: string]: string } = {
   OPEN: "bg-yellow-300 text-yellow-700 hover:text-black",
@@ -175,17 +176,22 @@ export default function FinancialPage() {
             <Button variant="default" className="text-sm font-bold" onClick={() => {navigate("/reports/new");}}>Criar +</Button>
           </div>
 
-          <div className="p-9 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 overflow-y-scroll w-fit mx-auto">
+          <div className="p-9 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 overflow-y-scroll overflow-x-hidden w-fit mx-auto">
             
             {
-              loading ? <LoaderPinwheel className="animate-spin" />
-              :
-              (data.length == 0) ? <p>Não há relatórios para serem aprovados no momento.</p> :
-              data.map((report: any) => {
-                return(
-                  <ApprovalReportCard key={report.id + Math.floor(Math.random() * 100)} report={report} navigate={navigate}/>
-                )
-              })
+              loading ? (
+                <div className="w-[calc(100vw-256px)] h-[calc(100vh-234px)] flex justify-center items-center">
+                  <LoaderPinwheel className="animate-spin h-20 w-20" />
+                </div>
+              ) : data.length > 0 ? (
+                data.map((report) => (
+                  <ApprovalReportCard key={report.id} report={report} navigate={navigate} />
+                ))
+              ) : (
+                <div className="w-[calc(100vw-256px)] h-[calc(100vh-354px)] flex justify-center items-center">
+                  <EmptyTable />
+                </div>
+              )
             }
 
           </div>

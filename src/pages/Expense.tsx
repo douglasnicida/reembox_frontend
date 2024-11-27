@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { LoaderPinwheel, Search } from "lucide-react";
 import TableComponent from "@/components/custom_components/TableComponent";
 import { Expense, ExpenseTableItem } from "@/types/models.type";
 import { Toaster } from "@/components/ui/toaster";
@@ -20,10 +20,12 @@ export default function ExpensePage() {
     currentPage: 1,
     size: 10,
   });
+  const [loading, setLoading] = React.useState<boolean>(true)
 
   const navigate = useNavigate()
 
   async function fetchExpenses(page: number, size: number = 10) {
+    setLoading(true);
     try {
       const { data } = await api.get<PaginatedResponse<Expense>>("/expenses", {
         params: {
@@ -46,6 +48,7 @@ export default function ExpensePage() {
     } catch (err: any) {
       errorHandler(err);
     }
+    setLoading(false)
   }
 
   React.useEffect(() => {
@@ -69,12 +72,19 @@ export default function ExpensePage() {
         </div>
 
         <div className="p-4">
-          <TableComponent 
-            resource="customers"
-            data={data}
-            columnHeaders={['Data da Despesa', 'Valor total', 'Cód. Projeto', 'Cód. Centro de Custo', 'Tipo de Despesa']} 
-            onPageChange={fetchExpenses}
-          />
+          {
+            loading ?
+            <div className="w-full h-[calc(100vh-234px)] flex justify-center items-center">
+              <LoaderPinwheel className="animate-spin h-20 w-20" />
+            </div>
+            :
+            <TableComponent 
+              resource="customers"
+              data={data}
+              columnHeaders={['Data da Despesa', 'Valor total', 'Cód. Projeto', 'Cód. Centro de Custo', 'Tipo de Despesa']} 
+              onPageChange={fetchExpenses}
+            />
+          }
         </div>
       </div>
       <Toaster />

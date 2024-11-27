@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, LoaderPinwheel } from "lucide-react";
 import TableComponent from "@/components/custom_components/TableComponent";
 import { CostCenter } from "@/types/models.type";
 import { Toaster } from "@/components/ui/toaster";
@@ -25,6 +25,7 @@ export default function CostCenterPage() {
     const { reload, activeItem } = useActiveItem()
 
     const [q, setQ] = React.useState<string>("");
+    const [loading, setLoading] = React.useState<boolean>(true);
     const [active, setActive] = React.useState<boolean | undefined>(undefined);
     const [data, setData] = React.useState<Paginated<CostCenter>>({
         items: [],
@@ -35,6 +36,7 @@ export default function CostCenterPage() {
     });
 
     async function fetchCostCenters(page: number, size: number = 10) {
+        setLoading(true)
         try {
             const params: Record<string, any> = { page, size };
             if (q) params.q = q;
@@ -51,6 +53,7 @@ export default function CostCenterPage() {
         } catch (err: any) {
             errorHandler(err);
         }
+        setLoading(false)
     }
 
     React.useEffect(() => {
@@ -117,18 +120,25 @@ export default function CostCenterPage() {
                 </form>
 
                 <div className="p-4">
-                    <TableComponent
-                        resource="cost-centers"
-                        data={data}
-                        columnHeaders={[
-                            "Código",
-                            "Descrição",
-                            "Criado em",
-                            "Atualizado em",
-                            "Ativo",
-                        ]}
-                        onPageChange={fetchCostCenters}
-                    />
+                    {
+                        loading ?
+                        <div className="w-full h-[calc(100vh-234px)] flex justify-center items-center">
+                          <LoaderPinwheel className="animate-spin h-20 w-20" />
+                        </div>
+                        :
+                        <TableComponent
+                            resource="cost-centers"
+                            data={data}
+                            columnHeaders={[
+                                "Código",
+                                "Descrição",
+                                "Criado em",
+                                "Atualizado em",
+                                "Ativo",
+                            ]}
+                            onPageChange={fetchCostCenters}
+                        />
+                    }
                 </div>
             </div>
             <Toaster />
