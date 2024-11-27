@@ -1,5 +1,6 @@
 import api from "@/api/axios";
 import { handleFormatDate } from "@/utils/handleDate";
+import { LoaderPinwheel } from "lucide-react";
 import React from "react";
 import { useParams } from "react-router-dom";
 
@@ -8,10 +9,12 @@ const ReportDetailsPage = () => {
     const [report, setReport] = React.useState<any>({});
     const [expenses, setExpenses] = React.useState<any[]>([]);
     const [expandedImage, setExpandedImage] = React.useState<string | null>(null);
+    const [loading, setLoading] = React.useState<boolean>(true);
 
     const existingExpenseIds = new Set(expenses.map(exp => exp.id));
     React.useEffect(() => {
         const fetchExpenses = async () => {
+            setLoading(true)
             const { data } = await api.get(`/reports/${id}`);
             setReport(data.payload);
 
@@ -25,6 +28,8 @@ const ReportDetailsPage = () => {
                     existingExpenseIds.add(currentExpense.id);
                 }
             }
+
+            setLoading(false)
         };
 
         fetchExpenses();
@@ -40,12 +45,9 @@ const ReportDetailsPage = () => {
 
     return ( 
         <div className="flex-1 overflow-auto h-screen">
-            <div className="flex items-center justify-between gap-4 border-b border-zinc-700 bg-zinc-800 p-4">
-                <div className="relative flex-1">
-                    {/* Título ou cabeçalho pode ser adicionado aqui */}
-                </div>
-            </div>
 
+           {
+            (!loading && report) ?
             <div className="p-10">
                 <h2 className="text-2xl font-bold mb-4">{`${report.code} - ${report.name}`}</h2>
                 <p><span className="font-bold">Objetivo:</span> {report.goal}</p>
@@ -53,6 +55,11 @@ const ReportDetailsPage = () => {
                 <p className="mt-3"><span className="font-bold">Criado em:</span>  {handleFormatDate(report.createdAt)}</p>
                 <p><span className="font-bold">Atualizado em:</span>  {handleFormatDate(report.updatedAt)}</p>
             </div>
+            :
+            <div className="p-10 w-full h-[calc(100vh-65px)] flex justify-center items-center">
+                <LoaderPinwheel className="animate-spin h-16 w-16" />
+            </div>
+           }
 
             <div className="p-9 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5 overflow-y-scroll">
                 {
@@ -64,23 +71,27 @@ const ReportDetailsPage = () => {
                                 <p>Valor: {expense.value}</p>
                                 <p>Data da despesa: {handleFormatDate(expense.expenseDate)}</p>
                                 <div className="flex flex-col justify-between gap-4">
-                                    <p>Recebimentos:</p>
+                                    <p>Recibos:</p>
                                     <ul className="flex gap-2">
-                                        {expense.receipts.map((receipt: any) => (
-                                            <li key={receipt.id + 10}>
-                                                <img 
-                                                    src={receipt.url} 
-                                                    alt="" 
-                                                    onClick={() => handleImageClick(receipt.url)} 
-                                                    className="cursor-pointer w-60 h-60 object-cover" // Ajuste o tamanho da imagem conforme necessário
-                                                />
-                                            </li>
-                                        ))}
+                                        {
+                                            expense.receipts.length > 0 ?
+                                            expense.receipts.map((receipt: any) => (
+                                                <li key={receipt.id + 10}>
+                                                    <img 
+                                                        src={receipt.url} 
+                                                        alt="" 
+                                                        onClick={() => handleImageClick(receipt.url)} 
+                                                        className="cursor-pointer w-60 h-60 object-cover" // Ajuste o tamanho da imagem conforme necessário
+                                                    />
+                                                </li>
+                                            )) 
+                                            : <p>Não há recibos a serem mostrados</p>
+                                        }
                                     </ul>
                                 </div>
                             </div>
                         );
-                    })
+                    }) 
                 }
             </div>
 
