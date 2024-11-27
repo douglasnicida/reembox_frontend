@@ -183,7 +183,7 @@ export default function Sidebar() {
     }, []);
 
     return (
-        <div className="w-64 bg-zinc-800 p-4 h-full flex flex-col border-r border-zinc-700">
+        <div className="w-64 bg-zinc-800 p-4 h-screen flex flex-col border-r border-zinc-700">
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <div className="py-0.5 px-2.5 h-16 flex gap-x-5 cursor-default" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
@@ -200,7 +200,7 @@ export default function Sidebar() {
                 </DropdownMenuTrigger>
             </DropdownMenu>
 
-            <nav className="flex-grow h-screen overflow-y-auto mt-4">
+            <nav className="flex flex-col w-full h-[calc(100vh-165px)] overflow-y-scroll mt-4">
                 <SidebarItem Icon={Home} label="Início" active={activeItem === "Início"} onClick={() => handleItemClick("Início", "/home")} />
                 <Separator className="my-2 bg-zinc-700" />
                 {sideBarItems["sections"].map((section: any, index: number) => {
@@ -221,7 +221,7 @@ export default function Sidebar() {
                 })}
             </nav>
 
-            <div className="absolute bottom-2 left-0">
+            <div className="absolute bottom-0 left-0">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button className="h-16 hover:bg-zinc-700 flex gap-x-5" variant={"ghost"}>
