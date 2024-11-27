@@ -9,12 +9,12 @@ const ReportDetailsPage = () => {
     const [expenses, setExpenses] = React.useState<any[]>([]);
     const [expandedImage, setExpandedImage] = React.useState<string | null>(null);
 
+    const existingExpenseIds = new Set(expenses.map(exp => exp.id));
     React.useEffect(() => {
         const fetchExpenses = async () => {
             const { data } = await api.get(`/reports/${id}`);
             setReport(data.payload);
 
-            const existingExpenseIds = new Set(expenses.map(exp => exp.id));
 
             for (const expense of data.payload.expenses) {
                 const currentExpense = expense.expense;
@@ -54,7 +54,7 @@ const ReportDetailsPage = () => {
                 <p><span className="font-bold">Atualizado em:</span>  {handleFormatDate(report.updatedAt)}</p>
             </div>
 
-            <div className="p-9 grid grid-cols-1 xl:grid-cols-3 gap-5 overflow-y-scroll">
+            <div className="p-9 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5 overflow-y-scroll">
                 {
                     expenses.map((expense) => {
                         return (
