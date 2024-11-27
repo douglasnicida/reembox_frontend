@@ -11,6 +11,8 @@ import React from "react";
 import { MoreVertical } from "lucide-react";
 import { handleFormatDate } from "@/utils/handleDate";
 import { Checkbox } from "../ui/checkbox"; // Certifique-se de que Checkbox está importado
+import { Badge } from "../ui/badge";
+import { translateStatus } from "@/utils/handleStatus";
 
 export interface TableProps<T> {
   resource?: string;
@@ -20,6 +22,16 @@ export interface TableProps<T> {
   onPageChange: (page: number) => void;
   onSelectionChange?: (selectedIds: number[]) => void;
 }
+
+const statusColors: { [key: string]: string } = {
+  OPEN: "bg-yellow-300 text-yellow-700 hover:text-black",
+  SUBMITTED: "bg-blue-500 text-white hover:text-black",
+  REJECTED: "bg-red-500 text-white hover:text-black",
+  APPROVED: "bg-green-500 text-white hover:text-black",
+  PENDING_PROCESSING: "bg-orange-500 text-white hover:text-black",
+  PROCESSING_ERROR: "bg-gray-500 text-white hover:text-black",
+  PROCESSING_PAYMENT: "bg-purple-500 text-white hover:text-black",
+};
 
 export default function TableComponent<T extends Record<string, any>>(
   { resource, data, columnHeaders, onPageChange, onSelectionChange, actionFinish }: TableProps<T>
@@ -95,6 +107,14 @@ export default function TableComponent<T extends Record<string, any>>(
               />
             </TableCell>
           );
+        }
+
+        if(key === "status") {
+          return (
+            <TableCell key={key}>
+              <Badge className={`${statusColors[value]}`}> {translateStatus(value)} </Badge>
+            </TableCell>
+          )
         }
 
         value = handleFormatDate(value);
