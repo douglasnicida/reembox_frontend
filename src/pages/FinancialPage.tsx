@@ -21,6 +21,7 @@ import React from "react";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { toast } from "@/hooks/use-toast";
+import { translateStatus } from "@/utils/handleStatus";
 
 const statusColors: { [key: string]: string } = {
   OPEN: "bg-yellow-300 text-yellow-700 hover:text-black",
@@ -66,7 +67,7 @@ function VerifyAndApproveDialog({ reportStatus, currentReport }: VerifyAndApprov
     <div className="absolute right-5 bottom-0">
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button className={`${reportStatus} cursor-pointer`}>{currentReport.status}</Button>
+          <Button className={`${reportStatus} cursor-pointer`}>{translateStatus(currentReport.status)}</Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
