@@ -19,10 +19,15 @@ const RoutesMap: Record<string, string> = {
     "/expense-categories": "Tipos de Despesa",
     "/projects": "Projetos",
     "/customers": "Clientes",
+    "/allocations": "Alocações",
     "/financial": "Financeiro",
     "/approval": "Aprovação",
     "/config": "Configurações",
-    '/expense/new': "Nova despesa"
+    "/expense/new": "Nova despesa",
+    "/reports/new": "Novo Relatório",
+    "/allocations/new": "Nova alocação",
+    "/allocations/my": "Minhas alocações",
+    "/context": "Contexto"
 }
 
 const ActiveItemContext = createContext<ActiveItemContextType | undefined>(undefined);
@@ -41,7 +46,11 @@ export const ActiveItemProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         const location = window.location.pathname;
         
         setActiveItem('Início')
-        setActiveItem(RoutesMap[location]);
+        if(!location.includes('details')) {
+            setActiveItem(RoutesMap[location]);
+        } else {
+            setActiveItem('Detalhes')
+        }
 
 
     }, [window.location.pathname]);

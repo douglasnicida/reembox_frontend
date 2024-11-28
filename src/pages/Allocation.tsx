@@ -9,84 +9,63 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Filter, LoaderPinwheel } from "lucide-react";
+import { Search, Filter } from "lucide-react";
 import TableComponent from "@/components/custom_components/TableComponent";
-import { Project, ProjectTableItem } from "@/types/models.type";
+import { Allocation } from "@/types/models.type";
 import { Toaster } from "@/components/ui/toaster";
 import { errorHandler } from "@/utils/errorHandler";
 
 import api from "@/api/axios";
 import { Paginated, PaginatedResponse } from "@/types/response.type";
-import { dtoList } from "@/lib/utils";
-import CreationDialog from "@/components/custom_components/CreationDialog";
-import { useActiveItem } from "@/context/ActiveItemContext";
-import UpdateDialog from "@/components/custom_components/UpdateDialog.tsx";
-import {dtoUpdateList} from "@/lib/utilsUpdate.ts";
+import { useNavigate } from "react-router-dom";
+import { convertISOToDDMMYYYY } from "@/utils/handleDate";
+import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
 
-export default function ProjectPage() {
+export default function AllocationPage() {
   const [q, setQ] = useState("");
-  const [loading, setLoading] = React.useState<boolean>(true);
   const [active, setActive] = useState<boolean | undefined>(undefined);
-  const [data, setData] = useState<Paginated<ProjectTableItem>>({
+  const [data, setData] = useState<Paginated<Allocation>>({
     items: [],
     totalItems: 0,
     totalPages: 0,
     currentPage: 1,
     size: 10,
   });
-  const { activeItem,reload } = useActiveItem();
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editId, setEditId] = useState<number | null>(null);
-  async function fetchProjects(page: number, size: number = 10) {
-    setLoading(true)
+
+  async function fetchAllocations(page: number, size: number = 10) {
     try {
-      const params: Record<string, any> = { page, size };
-
-      if (q) params.q = q;
-
-      if (typeof active === "boolean") {
-        params.active = active ? 1 : 0;
-      }
-
-      const { data } = await api.get<PaginatedResponse<Project>>("/projects", {
-        params,
-      });
-
+      const { data } = await api.get<PaginatedResponse<Allocation>>(`/allocations?page=${page}&size=${size}`);
       setData({
         ...data.payload,
         items: data.payload.items.map(item => ({
           id: item.id,
-          key: item.key,
-          name: item.name,
-          customerName: item.customer.name,
-          createdAt: item.createdAt,
-          updatedAt: item.updatedAt,
-          active: item.active
-        }))
+          userName: item.user.name,
+          jobTitle: item.user.jobTitle?.title || "Sem cargo",
+          project: `${item.project.key} - ${item.project.name}`,
+          startDate: convertISOToDDMMYYYY(item.startDate),
+          estimatedEndDate: convertISOToDDMMYYYY(item.estimatedEndDate),
+          endDate: item.endDate ? convertISOToDDMMYYYY(item.endDate) : "Em andamento",
+        })) as any
       });
+      
     } catch (err: any) {
       errorHandler(err);
     }
-    setLoading(false)
   }
 
+  console.log(data)
+
+
+  const navigate = useNavigate()
+
   useEffect(() => {
-    fetchProjects(1);
-  }, [active,reload]);
+    fetchAllocations(1);
+  }, [active]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    fetchProjects(1);
+    fetchAllocations(1);
   }
-
-  const handleOpenEditModal = (id: number) => {
-    setEditId(id);
-    setIsEditModalOpen(true);
-  };
-  const handleCloseEditModal = () => {
-    setEditId(null);
-    setIsEditModalOpen(false);
-  };
 
   return (
     <>
@@ -108,7 +87,8 @@ export default function ProjectPage() {
                 }}
               />
             </div>
-            <CreationDialog dtoList={dtoList.dtos} currentLabel={activeItem} />
+
+            <Button variant="default" className="text-sm font-bold" onClick={() => navigate("/allocations/new")}>Criar +</Button>
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -143,31 +123,14 @@ export default function ProjectPage() {
         </form>
 
         <div className="p-4">
-          {
-            loading ?
-            <div className="w-full h-[calc(100vh-234px)] flex justify-center items-center">
-              <LoaderPinwheel className="animate-spin h-20 w-20" />
-            </div>
-            :
-            <TableComponent
-              resource="projects"
-              data={data}
-              columnHeaders={['Código', 'Nome', 'Cliente', 'Criado em', 'Atualizado em', 'Ativo']}
-              onPageChange={fetchProjects}
-              onEdit={handleOpenEditModal}
-            />
-          }
+          <TableComponent
+            resource="allocations"
+            data={data} 
+            columnHeaders={['Nome', 'Cargo', 'Projeto', 'Início', 'Término estimado', 'Término']} 
+            onPageChange={fetchAllocations}
+          />
         </div>
       </div>
-      {isEditModalOpen && (
-          <UpdateDialog
-              dtoList={dtoUpdateList.dtos}
-              currentLabel="Projetos"
-              editId={editId}
-              isOpen={isEditModalOpen}
-              onClose={handleCloseEditModal}
-          />
-      )}
       <Toaster />
     </>
   );

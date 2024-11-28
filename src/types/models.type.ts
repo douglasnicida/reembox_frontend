@@ -1,3 +1,13 @@
+enum ReportStatus {
+    OPEN,
+    SUBMITTED,
+    REJECTED,
+    APPROVED,
+    PENDING_PROCESSING,
+    PROCESSING_ERROR,
+    PROCESSING_PAYMENT,
+  }
+
 export type Collaborator = {
     id: number;
     name: string;
@@ -20,8 +30,59 @@ export type Customer = {
 }
 
 export type Report = {
-    id?: number;
+    id: number;
+    code?: string;
     goal: string;
+    name: string;
+    total?: number;
+    dueDate?: string;
+    creator: {
+        name: string;
+    }
+    approver: {
+        name: string;
+    }
+    expenses: ReportExpense[]
+    createdAt: string;
+    updatedAt: string;
+    status: ReportStatus
+}
+
+export type ReportTableItem = {
+    id: number;
+    key: number;
+    goal: string;
+    name: string;
+    total?: number;
+    creator: string;
+    approver: string;
+    createdAt: string;
+    updatedAt: string;
+    status: ReportStatus
+}
+
+export interface UserWithCompanyName {
+    id: number,
+    name: string,
+    company: { 
+        id: number,
+        name: string 
+    }
+}
+
+export type ReportParam = {
+    id: number;
+    name: string;
+}
+
+export type ReportParams = {
+    approvers: ReportParam[]
+    expenses: Expense[]
+}
+
+export type ReportExpense = {
+    expense: Expense;
+    report: Report;
 }
 
 export type CostCenter = {
@@ -74,6 +135,7 @@ export type Expense = {
     expenseDate: string,
     value: number,
     quantity: number,
+    notes?: string,
     project: {
         key: string
     },
@@ -94,16 +156,60 @@ export type ExpenseTableItem = {
     categoryDescription: string
 }
 
-export type ExpenseParam = {
+export type Param = {
     id: number;
     param: string;
   }
 
 export type ExpenseParams = {
-    costCenters: ExpenseParam[];
-    projects: ExpenseParam[]
-    categories: ExpenseParam[];
-    reports: ExpenseParam[];
+    costCenters: Param[];
+    projects: Param[]
+    categories: Param[];
+    reports: Param[];
+}
+
+export type AllocationParams = {
+    projects: Param[]
+    users: Param[]
+}
+
+export type Allocation = {
+    id: number,
+    startDate: string,
+    endDate: string,
+    estimatedEndDate: string,
+    project: {
+        key: string,
+        name: string
+    }
+    user: {
+        id: number,
+        name: string,
+        jobTitle: {
+            title: string,
+        },
+    },
+}
+
+export type MyAllocations = {
+    id: number,
+    startDate: string,
+    estimatedEndDate: string,
+    endDate: string,
+    project: {
+      name: string,
+      key: string,
+    },
+    customer: {
+      id: string,
+      name: string,
+    },
+    // Filtra os usuários que não são o próprio usuário
+    allocations: {
+        id: string,
+        name: string,
+        jobTitle: string,
+    }[]
 }
 
 export type GenericFilter = {

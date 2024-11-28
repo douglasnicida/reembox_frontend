@@ -37,7 +37,7 @@ export const ExpenseFormSchema = z.object({
   notes: z
     .string()
     .optional(),
-  reportCode: z.string().optional(),
+  reportId: z.string().optional(),
   costCenterId: z
     .number({
     required_error: "Centro de Custo é obrigatório",

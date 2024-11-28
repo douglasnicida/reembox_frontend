@@ -32,7 +32,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { ExpenseParam, ExpenseParams } from "@/types/models.type"
+import { ExpenseParams, Param } from "@/types/models.type"
 import api from "@/api/axios"
 import { errorHandler } from "@/utils/errorHandler"
 import React from "react"
@@ -43,11 +43,11 @@ import { toast } from "@/hooks/use-toast"
 import { useNavigate } from "react-router-dom"
 
 export default function CreateExpensePage() {
-  const [costCenters, setCostCenters] = useState<ExpenseParam[]>([])
-  const [projects, setProjects] = useState<ExpenseParam[]>([])
-  const [categories, setCategories] = useState<ExpenseParam[]>([])
-  const [reports, setReports] = useState<ExpenseParam[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [costCenters, setCostCenters] = useState<Param[]>([]);
+  const [projects, setProjects] = useState<Param[]>([]);
+  const [categories, setCategories] = useState<Param[]>([]);
+  const [reports, setReports] = useState<Param[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const navigate = useNavigate()
 
@@ -60,6 +60,20 @@ export default function CreateExpensePage() {
       notes: "",
     },
   })
+
+  async function handleUploadFiles(file: File) {
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const { data } = await api.post("/upload/", formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+
+    return data.payload;
+  }
 
   async function fetchParams() {
     try {
@@ -81,6 +95,9 @@ export default function CreateExpensePage() {
   }, []);
 
   async function onSubmit(expense: z.infer<typeof ExpenseFormSchema>) {
+    const receiptURLs: string[] = []
+    const receiptIDs: number[] = []
+
     try {
       const { images, ...rest } = expense
       const formData = new FormData()
@@ -89,15 +106,42 @@ export default function CreateExpensePage() {
         formData.append('receipts', receipt)
       }
 
-      console.log({
-        ...rest,
-        expenseDate: expense.expenseDate.toISOString()        
-      });
-      
+      // Ver como recupera os Files do FileList
+      for(let i=0 ; i<images.length ; i++) {
+        // Recuperando File
+        const file: File = images[i]
 
-      await api.post('expenses', {
+        // Fazer o upload no endpoint de upload
+        const publicFileURL: string = await handleUploadFiles(file);
+        
+        //salvar todas as URLs geradas dentro de ReceiptsURL
+        receiptURLs.push(publicFileURL)
+      }
+
+      // criando recibos sem vincular a uma despesa
+      receiptURLs.forEach(async (url: string) => {
+        const { data } = await api.post('/receipts/', {
+          url,
+        })
+
+        receiptIDs.push(data.payload)
+      })
+
+      const newExpense = {
         ...rest,
         expenseDate: expense.expenseDate.toISOString()        
+      }
+
+      console.log(newExpense)
+
+      // criando despesa
+      const expenseID = await api.post('expenses', newExpense)
+
+      // atribuindo aos recibos o ID da despesa
+      receiptIDs.forEach(async (id: number) => {
+        await api.patch(`/receipts/${id}`, {
+          expenseId: expenseID.data.payload,
+        })
       })
 
       toast({
@@ -259,11 +303,11 @@ export default function CreateExpensePage() {
                   {/* Relatório */}
                   <FormField
                     control={form.control}
-                    name="reportCode"
+                    name="reportId"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-white">Relatório</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
                           <FormControl>
                             <SelectTrigger className="bg-zinc-700 border-zinc-600 text-zinc-300">
                               <SelectValue placeholder="Selecione um relatório" />

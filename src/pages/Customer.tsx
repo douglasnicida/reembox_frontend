@@ -3,13 +3,14 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, LoaderPinwheel } from "lucide-react";
 import TableComponent from "@/components/custom_components/TableComponent";
 import { Customer } from "@/types/models.type";
 import { Toaster } from "@/components/ui/toaster";
@@ -22,10 +23,13 @@ import { dtoList } from "@/lib/utils";
 import { dtoUpdateList } from "@/lib/utilsUpdate";
 import { useActiveItem } from "@/context/ActiveItemContext";
 import UpdateDialog from "@/components/custom_components/UpdateDialog";
+import ApprovalRAGDialog from "./ApprovalRAGDialog";
 
 export default function CustomerPage() {
   const [q, setQ] = useState<string>("");
   const [active, setActive] = useState<boolean | undefined>(undefined);
+  const [loading, setLoading] = React.useState<boolean>(true);
+  const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
   const [data, setData] = useState<Paginated<Customer>>({
     items: [],
     totalItems: 0,
@@ -38,6 +42,7 @@ export default function CustomerPage() {
   const { activeItem,reload } = useActiveItem();
 
   async function fetchCustomers(page: number, size: number = 10) {
+    setLoading(true)
     try {
       const params: Record<string, any> = { page, size };
 
@@ -56,6 +61,7 @@ export default function CustomerPage() {
     } catch (err: any) {
       errorHandler(err);
     }
+    setLoading(false)
   }
 
   useEffect(() => {
@@ -75,6 +81,20 @@ export default function CustomerPage() {
     setEditId(null);
     setIsEditModalOpen(false);
   };
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const renderCustomActions = (item: Customer) => (
+      <>
+      <DropdownMenuItem onClick={() => {
+          setSelectedCustomerId(item.id);
+          setIsDialogOpen(true);
+        }}>
+        Aprovar RAG
+      </DropdownMenuItem>
+    </>
+  );
+
 
   return (
     <>
@@ -96,6 +116,7 @@ export default function CustomerPage() {
                 }}
               />
             </div>
+
             <CreationDialog dtoList={dtoList.dtos} currentLabel={activeItem} />
             
             <DropdownMenu>
@@ -131,13 +152,21 @@ export default function CustomerPage() {
         </form>
 
         <div className="p-4">
-          <TableComponent 
-            resource="customers"
-            data={data}
-            columnHeaders={['Nome', 'Telefone', 'E-mail', 'Criado em', 'Atualizado em', 'Ativo' ]} 
-            onPageChange={fetchCustomers}
-            onEdit={handleOpenEditModal}
-          />
+          {
+            loading ?
+            <div className="w-full h-[calc(100vh-234px)] flex justify-center items-center">
+              <LoaderPinwheel className="animate-spin h-20 w-20" />
+            </div>
+            :
+            <TableComponent
+              resource="customers"
+              data={data}
+              columnHeaders={['Nome', 'Telefone', 'E-mail', 'Criado em', 'Atualizado em', 'Ativo' ]}
+              onPageChange={fetchCustomers}
+              customActions={renderCustomActions}
+              onEdit={handleOpenEditModal}
+            />
+          }
         </div>
       </div>
       {isEditModalOpen && (
@@ -149,6 +178,13 @@ export default function CustomerPage() {
               onClose={handleCloseEditModal}
           />
       )}
+
+      <ApprovalRAGDialog
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        customerId={selectedCustomerId}
+      />
+
       <Toaster />
     </>
   );

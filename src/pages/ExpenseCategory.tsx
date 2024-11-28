@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, LoaderPinwheel } from "lucide-react";
 import TableComponent from "@/components/custom_components/TableComponent";
 import { ExpenseCategory } from "@/types/models.type";
 import { Toaster } from "@/components/ui/toaster";
@@ -24,6 +24,7 @@ import {dtoUpdateList} from "@/lib/utilsUpdate.ts";
 
 export default function ExpenseCategoryPage() {
   const [q, setQ] = useState("");
+  const [loading, setLoading] = React.useState<boolean>(true);
   const [active, setActive] = useState<boolean | undefined>(undefined);
   const [data, setData] = useState<Paginated<ExpenseCategory>>({
     items: [],
@@ -32,11 +33,11 @@ export default function ExpenseCategoryPage() {
     currentPage: 1,
     size: 10,
   });
-  const { activeItem } = useActiveItem();
+  const { activeItem, reload } = useActiveItem();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
-  const { reload} = useActiveItem();
   async function fetchExpenseCategories(page: number, size: number = 10) {
+    setLoading(true)
     try {
       const params: Record<string, any> = { page, size };
 
@@ -55,6 +56,7 @@ export default function ExpenseCategoryPage() {
     } catch (err: any) {
       errorHandler(err);
     }
+    setLoading(false)
   }
 
   useEffect(() => {
@@ -130,13 +132,20 @@ export default function ExpenseCategoryPage() {
         </form>
 
         <div className="p-4">
-          <TableComponent 
-            resource="expense-categories"
-            data={data} 
-            columnHeaders={['Descrição', 'Criado em', 'Atualizado em', 'Ativo']} 
-            onPageChange={fetchExpenseCategories}
-            onEdit={handleOpenEditModal}
-          />
+          {
+            loading ?
+            <div className="w-full h-[calc(100vh-234px)] flex justify-center items-center">
+              <LoaderPinwheel className="animate-spin h-20 w-20" />
+            </div>
+            :
+            <TableComponent
+              resource="expense-categories"
+              data={data}
+              columnHeaders={['Descrição', 'Criado em', 'Atualizado em', 'Ativo']}
+              onPageChange={fetchExpenseCategories}
+              onEdit={handleOpenEditModal}
+            />
+          }
         </div>
       </div>
 
