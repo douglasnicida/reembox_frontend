@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/chart"
 import api from "./api/axios"
 import { useEffect, useState } from "react"
+import { useAuth } from "./hooks/useAuth"
 
 
 const chartConfig = {
@@ -67,9 +68,12 @@ const chartConfig2 = {
 
 function App() {
   const [chartData, setChartData] = useState<any[]>([]);
+  const [chartUserData, setChartUserData] = useState<any[]>([]);
   const [chartPieData, setChartPieData] = useState<any[]>([]);
 
-  function handleLineChartData(data: any, data2?: any) {
+  const { user } = useAuth()
+
+  function handleLineChartData(data: any,  isUser: boolean, data2?: any) {
     const monthlyReports: { [key: string]: number } = {};
     const monthlyReports2: { [key: string]: number } = {};
     
@@ -91,7 +95,7 @@ function App() {
       }
     });
 
-    if(data2) {
+    if(data2 && !isUser) {
       data2.payload.forEach((report: any) => {
         const date = new Date(report.createdAt);
         const month = date.getMonth();
@@ -114,7 +118,11 @@ function App() {
       };
     });
 
-    setChartData(formattedChartData);
+    if(!isUser){
+      setChartData(formattedChartData)  
+    } else {
+      setChartUserData(formattedChartData)
+    }
   }
 
   function handlePieChartData(data: any) {
@@ -170,6 +178,15 @@ function App() {
       }
     });
 
+    const currentYearReportsIndividual = await api.get('/reports/findAllByCompany', {
+      params: {
+        query: {
+          year: new Date().getFullYear(),
+          user: true
+        }
+      }
+    });
+
     const lastYearReports = await api.get('/reports/findAllByCompany', {
       params: {
         query: {
@@ -178,7 +195,9 @@ function App() {
       }
     });
     
-    handleLineChartData(currentYearReports.data, lastYearReports.data);
+    
+    handleLineChartData(currentYearReports.data, false, lastYearReports.data);
+    handleLineChartData(currentYearReportsIndividual.data, true);
     handlePieChartData(currentYearReports.data);
   }
 
@@ -187,7 +206,7 @@ function App() {
     return (
       <Card className="">
         <CardHeader>
-          <CardTitle>Relatórios do ano</CardTitle>
+          <CardTitle>Quantidade Relatórios</CardTitle>
           <CardDescription>Janeiro - Dezembro 20{year-1}-{year}</CardDescription>
         </CardHeader>
         <CardContent>
@@ -258,6 +277,69 @@ function App() {
     )
   }
 
+  function ComponentUserLineChart() {
+    const year = Number(new Date().getFullYear().toString().slice(2,4))
+    return (
+      <Card className="">
+        <CardHeader>
+          <CardTitle>Relatórios do ano ({user?.name})</CardTitle>
+          <CardDescription>Janeiro - Dezembro 20{year}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ChartContainer config={chartConfig} className="w-auto">
+            <LineChart
+              accessibilityLayer
+              data={chartUserData}
+              margin={{
+                top: 20,
+                left: 12,
+                right: 12,
+              }}
+            >
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="createdAt"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                tickFormatter={(value) => value.slice(0, 3)}
+              />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent indicator="line" />}
+              />
+
+              <Line
+                dataKey="totalCurrentYear"
+                type="natural"
+                stroke="var(--color-totalCurrentYear)"
+                strokeWidth={2}
+                dot={{
+                  fill: "var(--color-totalCurrentYear)",
+                }}
+                activeDot={{
+                  r: 6,
+                }}
+              >
+              </Line>
+              <LabelList
+                position="top"
+                offset={12}
+                className="fill-foreground"
+                fontSize={12}
+              />
+            </LineChart>
+          </ChartContainer>
+        </CardContent>
+        <CardFooter className="flex-col items-start gap-2 text-sm">
+          <div className="leading-none text-muted-foreground">
+            Total de relatórios criados por mês no ano de 2024
+          </div>
+        </CardFooter>
+      </Card>
+    )
+  }
+
   function ComponentPie() {
 
     return (
@@ -295,13 +377,17 @@ function App() {
   }, [])
 
   return (
-    <div className="flex flex-wrap h-auto p-6 gap-4 w-full mx-auto max-w-screen-xl">
+    <div className="flex flex-wrap h-full p-9 gap-4 w-full mx-auto max-w-screen-2xl items-center">
       <div className="h-fit flex-1 min-w-[300px]">
         <ComponentLineChart />
       </div>
 
       <div className="h-fit flex-1 min-w-[300px]">
         <ComponentPie />
+      </div>
+
+      <div className="h-fit flex-1 min-w-[300px]">
+        <ComponentUserLineChart />
       </div>
 </div>
   )
