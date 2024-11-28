@@ -312,10 +312,10 @@ function App() {
               <Line
                 dataKey="totalCurrentYear"
                 type="natural"
-                stroke="var(--color-totalCurrentYear)"
+                stroke="hsl(var(--chart-4))"
                 strokeWidth={2}
                 dot={{
-                  fill: "var(--color-totalCurrentYear)",
+                  fill: "hsl(var(--chart-4))",
                 }}
                 activeDot={{
                   r: 6,
