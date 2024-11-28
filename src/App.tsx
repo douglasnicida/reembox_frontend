@@ -1,4 +1,4 @@
-import { CartesianGrid, LabelList, Line, LineChart, XAxis, Pie, PieChart } from "recharts"
+import { CartesianGrid, LabelList, Line, LineChart, XAxis, Pie, PieChart, Tooltip } from "recharts"
 import {
   Card,
   CardContent,
@@ -10,20 +10,19 @@ import {
 import {
   ChartConfig,
   ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
 import api from "./api/axios"
 import { useEffect, useState } from "react"
 
+
 const chartConfig = {
   desktop: {
-    label: "Desktop",
+    label: "Counter",
     color: "hsl(var(--chart-1))",
-  },
-  mobile: {
-    label: "Mobile",
-    color: "hsl(var(--chart-2))",
   },
 } satisfies ChartConfig
 
@@ -32,25 +31,33 @@ const chartConfig2 = {
     label: "Contador",
     color: "var(--color-total)",
   },
-  aberto: {
+  ABERTO: {
     label: "ABERTO",
-    color: "var(--color-chrome)",
+    color: "hsl(var(--chart-1))",
   },
-  submetido: {
+  SUBMETIDO: {
     label: "SUBMETIDO",
-    color: "var(--color-safari)",
+    color: "hsl(var(--chart-2))",
   },
-  aprovado: {
+  APROVADO: {
     label: "APROVADO",
-    color: "var(--color-firefox)",
+    color: "hsl(var(--chart-3))",
   },
-  rejeitado: {
+  REJEITADO: {
     label: "REJEITADO",
-    color: "var(--color-edge)",
+    color: "hsl(var(--chart-4))",
   },
-  other: {
-    label: "Other",
+  PROCESSAMENTO_PENDENTE: {
+    label: "PROCESSAMENTO PENDENTE",
     color: "hsl(var(--chart-5))",
+  },
+  ERRO_PROCESSAMENTO: {
+    label: "ERRO PROCESSAMENTO",
+    color: "hsl(var(--chart-6))",
+  },
+  PROCESSANDO_PAGAMENTO: {
+    label: "PROCESSANDO PAGAMENTO",
+    color: "hsl(var(--chart-7))",
   },
 } satisfies ChartConfig
 
@@ -94,9 +101,9 @@ function App() {
       { label: 'SUBMETIDO', count: 0, fill: 'blue' },
       { label: 'REJEITADO', count: 0, fill: 'red' },
       { label: 'APROVADO', count: 0, fill: 'green' },
-      { label: 'PROCESSAMENTO PENDENTE', count: 0, fill: 'yellow' },
-      { label: 'ERRO PROCESSAMENTO', count: 0, fill: 'purple' },
-      { label: 'PROCESSANDO PAGAMENTO', count: 0, fill: 'pink' },
+      { label: 'PROCESSAMENTO_PENDENTE', count: 0, fill: 'yellow' },
+      { label: 'ERRO_PROCESSAMENTO', count: 0, fill: 'purple' },
+      { label: 'PROCESSANDO_PAGAMENTO', count: 0, fill: 'pink' },
   ];
 
   data.payload.forEach((report: any) => {
@@ -114,19 +121,23 @@ function App() {
             statusCounter.find(status => status.label === 'APROVADO')!.count++;
             break;
         case 'PROCESSING PENDING':
-            statusCounter.find(status => status.label === 'PROCESSAMENTO PENDENTE')!.count++;
+            statusCounter.find(status => status.label === 'PROCESSAMENTO_PENDENTE')!.count++;
             break;
         case 'PROCESSING ERROR':
-            statusCounter.find(status => status.label === 'ERRO PROCESSAMENTO')!.count++;
+            statusCounter.find(status => status.label === 'ERRO_PROCESSAMENTO')!.count++;
             break;
         case 'PROCESSING PAYMENT':
-            statusCounter.find(status => status.label === 'PROCESSANDO PAGAMENTO')!.count++;
+            statusCounter.find(status => status.label === 'PROCESSANDO_PAGAMENTO')!.count++;
             break;
     }
   });
 
-    setChartPieData(statusCounter)
-  }
+  setChartPieData(statusCounter.map(status => ({
+    label: status.label,
+    count: status.count,
+    fill: status.fill
+  })))
+}
 
   async function fetchReports() {
     const { data } = await api.get('/reports/findAllByCompany');
@@ -143,7 +154,7 @@ function App() {
           <CardDescription>Janeiro - Junho 2024</CardDescription>
         </CardHeader>
         <CardContent>
-          <ChartContainer config={chartConfig}>
+          <ChartContainer config={chartConfig} className=" w-auto">
             <LineChart
               accessibilityLayer
               data={chartData}
@@ -197,34 +208,36 @@ function App() {
   }
 
   function ComponentPie() {
+
     return (
-      <Card className="flex flex-col">
-        <CardHeader className="items-center pb-0">
-          <CardTitle>Status Relatórios</CardTitle>
-          <CardDescription>Janeiro - Dezembro 2024</CardDescription>
-        </CardHeader>
-        <CardContent className="flex-1 pb-0">
-          <ChartContainer
-            config={chartConfig2}
-            className="mx-auto aspect-square max-h-[250px]"
-          >
-            <PieChart>
-              <ChartTooltip
-                cursor={false}
-                content={<ChartTooltipContent hideLabel />}
-              />
-              <Pie data={chartPieData} dataKey="count" nameKey="label" />
-            </PieChart>
-          </ChartContainer>
-        </CardContent>
-        <CardFooter className="flex-col gap-2 text-sm">
-          <div className="leading-none text-muted-foreground">
-            Total de relatórios por status
-          </div>
-        </CardFooter>
-      </Card>
-    )
-  }
+        <Card className="flex flex-col">
+            <CardHeader className="items-center pb-0">
+                <CardTitle>Status Relatórios</CardTitle>
+                <CardDescription>Janeiro - Dezembro 2024</CardDescription>
+            </CardHeader>
+            <CardContent className="flex-1 pb-0">
+                <ChartContainer
+                    config={chartConfig2}
+                    className="mx-auto aspect-square max-h-[350px]"
+                >
+                    <PieChart>
+                        <Tooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+                        <Pie data={chartPieData} dataKey="count" nameKey="label" fill="gray"/>
+                        <ChartLegend 
+                        content={<ChartLegendContent nameKey="label" />} 
+                        className="-translate-y-2 text-[10px] grid grid-cols-3 gap-x-4 gap-y-2 [&>*]:items-center [&>*]:justify-left"
+                        />
+                    </PieChart>
+                </ChartContainer>
+            </CardContent>
+            <CardFooter className="flex-col gap-2 text-sm">
+                <div className="leading-none text-muted-foreground">
+                    Total de relatórios por status
+                </div>
+            </CardFooter>
+        </Card>
+    );
+}
 
   useEffect(() => {
     fetchReports()
