@@ -137,7 +137,7 @@ function App() {
 
   function ComponentLineChart() {
     return (
-      <Card>
+      <Card className="">
         <CardHeader>
           <CardTitle>Relatórios do ano</CardTitle>
           <CardDescription>Janeiro - Junho 2024</CardDescription>
@@ -231,12 +231,15 @@ function App() {
   }, [])
 
   return (
-    <div className="">
-      <div className="h-screen grid grid-cols-3 grid-rows-2 p-24 overflow-y-scroll gap-6">
+    <div className="flex flex-wrap h-auto p-6 gap-4 w-full mx-auto max-w-screen-xl">
+      <div className="h-fit flex-1 min-w-[300px]">
         <ComponentLineChart />
+      </div>
+
+      <div className="h-fit flex-1 min-w-[300px]">
         <ComponentPie />
       </div>
-    </div>
+</div>
   )
 }
 
