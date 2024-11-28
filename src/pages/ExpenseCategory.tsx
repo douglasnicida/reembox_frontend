@@ -19,6 +19,8 @@ import { Paginated, PaginatedResponse } from "@/types/response.type";
 import CreationDialog from "@/components/custom_components/CreationDialog";
 import { dtoList } from "@/lib/utils";
 import { useActiveItem } from "@/context/ActiveItemContext";
+import UpdateDialog from "@/components/custom_components/UpdateDialog.tsx";
+import {dtoUpdateList} from "@/lib/utilsUpdate.ts";
 
 export default function ExpenseCategoryPage() {
   const [q, setQ] = useState("");
@@ -31,7 +33,9 @@ export default function ExpenseCategoryPage() {
     size: 10,
   });
   const { activeItem } = useActiveItem();
-
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editId, setEditId] = useState<number | null>(null);
+  const { reload} = useActiveItem();
   async function fetchExpenseCategories(page: number, size: number = 10) {
     try {
       const params: Record<string, any> = { page, size };
@@ -55,12 +59,21 @@ export default function ExpenseCategoryPage() {
 
   useEffect(() => {
     fetchExpenseCategories(1);
-  }, [active]);
+  }, [active,reload]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     fetchExpenseCategories(1);
   }
+
+  const handleOpenEditModal = (id: number) => {
+    setEditId(id);
+    setIsEditModalOpen(true);
+  };
+  const handleCloseEditModal = () => {
+    setEditId(null);
+    setIsEditModalOpen(false);
+  };
 
   return (
     <>
@@ -122,9 +135,20 @@ export default function ExpenseCategoryPage() {
             data={data} 
             columnHeaders={['Descrição', 'Criado em', 'Atualizado em', 'Ativo']} 
             onPageChange={fetchExpenseCategories}
+            onEdit={handleOpenEditModal}
           />
         </div>
       </div>
+
+      {isEditModalOpen && (
+          <UpdateDialog
+              dtoList={dtoUpdateList.dtos}
+              currentLabel="Tipos de Despesa"
+              editId={editId}
+              isOpen={isEditModalOpen}
+              onClose={handleCloseEditModal}
+          />
+      )}
       <Toaster />
     </>
   );

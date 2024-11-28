@@ -39,6 +39,9 @@ interface UpdateDialogProps {
 const valueToDtoMap: Record<string, string> = {
   "Clientes": "update-customer",
   "Centros de Custo": "update-cost-center",
+  "Tipos de Despesa": "update-expense-category",
+  "Cargos": "update-job-title",
+  "Projetos":"update-project",
 };
 
 const RenderFields = ({
@@ -121,7 +124,6 @@ const UpdateDialog = ({
   const [currentDTO, setCurrentDTO] = useState<DtoFormat | undefined>();
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState<boolean>(false);
-
   useEffect(() => {
     if (dtoList[valueToDtoMap[currentLabel]] && editId) {
       setCurrentDTO(dtoList[valueToDtoMap[currentLabel]]);
@@ -140,7 +142,7 @@ const UpdateDialog = ({
       };
       fetchData();
     }
-  }, [dtoList, currentLabel, editId]);
+  }, [dtoList, currentLabel, editId,reload]);
 
   async function handleUpdateFormSubmit(e: any) {
     e.preventDefault();
@@ -151,11 +153,11 @@ const UpdateDialog = ({
       if (endpoint != null) {
         await api.patch(`${endpoint}${editId}`, formData);
       }
+      setReload(!reload);
       onClose(); // Fecha o modal após a atualização
       toast({ title: "Registro atualizado com sucesso!" });
-      setReload(!reload);
     } catch (err: any) {
-      console.error("Erro ao criar:", err);
+      console.error("Erro ao atualizar:", err);
       toast({ title: err.response.data.message });
     }
   }

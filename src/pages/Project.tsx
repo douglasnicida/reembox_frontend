@@ -20,6 +20,8 @@ import { Paginated, PaginatedResponse } from "@/types/response.type";
 import { dtoList } from "@/lib/utils";
 import CreationDialog from "@/components/custom_components/CreationDialog";
 import { useActiveItem } from "@/context/ActiveItemContext";
+import UpdateDialog from "@/components/custom_components/UpdateDialog.tsx";
+import {dtoUpdateList} from "@/lib/utilsUpdate.ts";
 
 export default function ProjectPage() {
   const [q, setQ] = useState("");
@@ -31,8 +33,9 @@ export default function ProjectPage() {
     currentPage: 1,
     size: 10,
   });
-  const { activeItem } = useActiveItem();
-
+  const { activeItem,reload } = useActiveItem();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editId, setEditId] = useState<number | null>(null);
   async function fetchProjects(page: number, size: number = 10) {
     try {
       const params: Record<string, any> = { page, size };
@@ -66,12 +69,21 @@ export default function ProjectPage() {
 
   useEffect(() => {
     fetchProjects(1);
-  }, [active]);
+  }, [active,reload]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     fetchProjects(1);
   }
+
+  const handleOpenEditModal = (id: number) => {
+    setEditId(id);
+    setIsEditModalOpen(true);
+  };
+  const handleCloseEditModal = () => {
+    setEditId(null);
+    setIsEditModalOpen(false);
+  };
 
   return (
     <>
@@ -133,9 +145,19 @@ export default function ProjectPage() {
             data={data} 
             columnHeaders={['Código', 'Nome', 'Cliente', 'Criado em', 'Atualizado em', 'Ativo']} 
             onPageChange={fetchProjects}
+            onEdit={handleOpenEditModal}
           />
         </div>
       </div>
+      {isEditModalOpen && (
+          <UpdateDialog
+              dtoList={dtoUpdateList.dtos}
+              currentLabel="Projetos"
+              editId={editId}
+              isOpen={isEditModalOpen}
+              onClose={handleCloseEditModal}
+          />
+      )}
       <Toaster />
     </>
   );

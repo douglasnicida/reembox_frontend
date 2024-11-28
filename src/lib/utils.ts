@@ -119,7 +119,39 @@ export const dtoList = {
              apiReqKey: "active"
            }
          ], 
-        req: '/expense-category/'
+        req: '/expense-categories/'
+      },
+      "create-job-title": {
+        description:"Preencha os campos abaixo para criar um cargo.",
+        fields:[
+          {
+            label:"Cargo",
+            type:"textarea",
+            apiReqKey: "title"
+          },
+        ],
+        req: '/job-titles/'
+      },
+      "create-project": {
+        description:"Preencha os campos abaixo para criar um projeto.",
+        fields:[
+          {
+            label:"Nome",
+            type:"textarea",
+            apiReqKey: "name"
+          },
+          {
+            label:"Chave do projeto",
+            type:"textarea",
+            apiReqKey: "key"
+          },
+          {
+            label:"ID do cliente",
+            type:"number",
+            apiReqKey: "customerId"
+          },
+        ],
+        req: '/projects/'
       },
       // Exemplo para create-job-title:
       // ...

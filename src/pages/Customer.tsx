@@ -35,7 +35,7 @@ export default function CustomerPage() {
   });
   const [editId, setEditId] = useState<number | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const { activeItem } = useActiveItem();
+  const { activeItem,reload } = useActiveItem();
 
   async function fetchCustomers(page: number, size: number = 10) {
     try {
@@ -60,7 +60,7 @@ export default function CustomerPage() {
 
   useEffect(() => {
     fetchCustomers(1);
-  }, [active]);
+  }, [active,reload]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

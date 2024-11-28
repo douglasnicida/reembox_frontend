@@ -1,10 +1,5 @@
 import * as React from "react";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import TableComponent from "@/components/custom_components/TableComponent";
 import { JobTitle } from "@/types/models.type";
@@ -16,6 +11,9 @@ import { Paginated, PaginatedResponse } from "@/types/response.type";
 import CreationDialog from "@/components/custom_components/CreationDialog";
 import { dtoList } from "@/lib/utils";
 import { useActiveItem } from "@/context/ActiveItemContext";
+import UpdateDialog from "@/components/custom_components/UpdateDialog.tsx";
+import {dtoUpdateList} from "@/lib/utilsUpdate.ts";
+import {useState} from "react";
 
 export default function JobTitlePage() {
   const [q, setQ] = React.useState(""); 
@@ -26,8 +24,9 @@ export default function JobTitlePage() {
     currentPage: 1,
     size: 10,
   });
-  const { activeItem } = useActiveItem();
-
+  const { activeItem,reload } = useActiveItem();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editId, setEditId] = useState<number | null>(null);
   async function fetchJobTitles(page: number, size: number = 10) {
     try {
       const params: Record<string, any> = { page, size };
@@ -47,12 +46,21 @@ export default function JobTitlePage() {
 
   React.useEffect(() => {
     fetchJobTitles(1); 
-  }, []); 
+  }, [reload]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     fetchJobTitles(1); 
   }
+
+  const handleOpenEditModal = (id: number) => {
+    setEditId(id);
+    setIsEditModalOpen(true);
+  };
+  const handleCloseEditModal = () => {
+    setEditId(null);
+    setIsEditModalOpen(false);
+  };
 
   return (
     <>
@@ -83,9 +91,19 @@ export default function JobTitlePage() {
             data={data}
             columnHeaders={['Cargo', 'Qtd. de Funcionários']}
             onPageChange={fetchJobTitles}
+            onEdit={handleOpenEditModal}
           />
         </div>
       </div>
+      {isEditModalOpen && (
+          <UpdateDialog
+              dtoList={dtoUpdateList.dtos}
+              currentLabel="Cargos"
+              editId={editId}
+              isOpen={isEditModalOpen}
+              onClose={handleCloseEditModal}
+          />
+      )}
       <Toaster />
     </>
   );
