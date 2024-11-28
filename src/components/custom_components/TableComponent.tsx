@@ -149,8 +149,8 @@ export default function TableComponent<T extends Record<string, any>>(
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       {customActions && customActions(item)}
-                      <DropdownMenuItem>Editar</DropdownMenuItem>
-                      <DropdownMenuItem>Excluir</DropdownMenuItem>
+                      <DropdownMenuItem className="cursor-pointer">Editar</DropdownMenuItem>
+                      <DropdownMenuItem className="cursor-pointer">Excluir</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>

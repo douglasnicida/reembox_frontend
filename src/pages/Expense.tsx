@@ -10,6 +10,11 @@ import { errorHandler } from "@/utils/errorHandler";
 import api from "@/api/axios";
 import { Paginated, PaginatedResponse } from "@/types/response.type";
 import { useNavigate } from "react-router-dom";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle } from "@/components/ui/dialog";
+import { toast } from "@/hooks/use-toast";
+import { AxiosError } from "axios";
 
 export default function ExpensePage() {
   const [q, setQ] = React.useState("");
@@ -20,8 +25,12 @@ export default function ExpensePage() {
     currentPage: 1,
     size: 10,
   });
+  const [reports, setReports] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState<boolean>(true)
-
+  const [selectedReportID, setSelectedReportID] = React.useState<string>('')
+  const [selectedExpenseID, setSelectedExpenseID] = React.useState<string>('')
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  
   const navigate = useNavigate()
 
   async function fetchExpenses(page: number, size: number = 10) {
@@ -51,12 +60,91 @@ export default function ExpensePage() {
     setLoading(false)
   }
 
+  async function fetchReports(page: number, size: number = 20) {
+    const reportsResponse = await api.get('/reports/findAllByCreator', {
+      params: {
+        page,
+        size,
+      },
+    })
+  
+    setReports(reportsResponse.data.payload.items)
+  }
+
+  async function handleAddExpenseToReport() {
+    if(selectedReportID == '' || selectedExpenseID == '') {
+      toast({
+        title: 'Erro ao adicionar despesa ao relatório',
+        description: 'Selecione pelo menos um relatório',
+        variant: 'destructive'
+      })
+      return;
+    } else {
+      try {
+        await api.patch(`/expenses/addExpenseToReport/${selectedExpenseID}`, {reportId: +selectedReportID})
+        toast({
+          title: 'Despesa adicionada com sucesso ao relatório',
+          variant: 'default'
+        })
+      } catch(e: any) {
+        errorHandler(e)
+      }
+    }
+
+    setSelectedExpenseID('')
+    setSelectedReportID('')
+    setIsDialogOpen(false)
+  }
+
+  async function fetchAll(){
+    await fetchExpenses(1);
+    await fetchReports(1);
+  }
+
   React.useEffect(() => {
-    fetchExpenses(1);
+    setIsDialogOpen(false)
+    fetchAll()
   }, []);
+
+  const renderCustomActions = (item: any) => {
+    return (
+        <DropdownMenuItem className="cursor-pointer">
+            <a onClick={() => {setIsDialogOpen(true); setSelectedExpenseID(item.id)}}> Adicionar despesa a relatório </a>
+        </DropdownMenuItem>
+    );
+};
+
 
   return (
     <>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        {
+          isDialogOpen &&
+          <DialogContent>
+              <DialogTitle> Adicione esta despesa ao relatório </DialogTitle>
+              <DialogDescription>Selecione o relatório no qual a despesa será adicionada</DialogDescription>
+              <Select onValueChange={(value) => setSelectedReportID(value)}>
+                  <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Selecione um relatório" />
+                  </SelectTrigger>
+                  <SelectContent>
+                      <SelectGroup>
+                          {reports.map(report => (
+                              <SelectItem key={report.id} value={report.id} className="cursor-pointer">
+                                  {report.name}
+                              </SelectItem>
+                          ))}
+                      </SelectGroup>
+                  </SelectContent>
+              </Select>
+              <DialogFooter>
+                  <Button variant={"secondary"} onClick={() => {setIsDialogOpen(false); setSelectedExpenseID('')}}>Cancelar</Button>
+                  <Button variant={'default'} onClick={handleAddExpenseToReport}>Confirmar</Button>
+              </DialogFooter>
+          </DialogContent>
+        }
+    </Dialog>
+
       <div className="flex-1 overflow-auto">
         <div className="flex items-center justify-between gap-4 border-b border-zinc-700 bg-zinc-800 p-4">
           <div className="relative flex-1">
@@ -83,6 +171,7 @@ export default function ExpensePage() {
               data={data}
               columnHeaders={['Data da Despesa', 'Valor total', 'Cód. Projeto', 'Cód. Centro de Custo', 'Tipo de Despesa']} 
               onPageChange={fetchExpenses}
+              customActions={renderCustomActions}
             />
           }
         </div>

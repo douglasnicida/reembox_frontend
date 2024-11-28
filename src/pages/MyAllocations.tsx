@@ -5,8 +5,7 @@ import { errorHandler } from "@/utils/errorHandler";
 
 import api from "@/api/axios";
 import { Paginated, PaginatedResponse } from "@/types/response.type";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
 import { ChevronsUpDown } from "lucide-react";
@@ -93,7 +92,7 @@ export default function MyAllocationsPage() {
                   {allocation.allocations[0].name}, {allocation.allocations[0].jobTitle || "Sem cargo"}
               </div>
               {allocation.allocations.map(alloc => (
-                  <CollapsibleContent key={alloc.id} lassName="space-y-2">
+                  <CollapsibleContent key={alloc.id} className="space-y-2">
                       <div className="rounded-md border px-4 py-2 font-mono text-sm shadow-sm">
                         {alloc.name}, {alloc.jobTitle || "Sem cargo"}
                       </div>
