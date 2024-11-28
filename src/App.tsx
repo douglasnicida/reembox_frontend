@@ -1,4 +1,3 @@
-import { TrendingUp } from "lucide-react"
 import { CartesianGrid, LabelList, Line, LineChart, XAxis, Pie, PieChart } from "recharts"
 import {
   Card,
