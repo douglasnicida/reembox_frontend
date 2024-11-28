@@ -20,9 +20,13 @@ import { useEffect, useState } from "react"
 
 
 const chartConfig = {
-  desktop: {
-    label: "Counter",
-    color: "hsl(var(--chart-1))",
+  totalLastYear: {
+    label: Number(new Date().getFullYear() - 1).toString(),
+    color: "hsl(var(--chart-2))",
+  },
+  totalCurrentYear: {
+    label: Number(new Date().getFullYear()).toString(),
+    color: "hsl(var(--chart-5))",
   },
 } satisfies ChartConfig
 
@@ -37,27 +41,27 @@ const chartConfig2 = {
   },
   SUBMETIDO: {
     label: "SUBMETIDO",
-    color: "hsl(var(--chart-2))",
+    color: "hsl(var(--chart-3))",
   },
   APROVADO: {
     label: "APROVADO",
-    color: "hsl(var(--chart-3))",
+    color: "hsl(var(--chart-2))",
   },
   REJEITADO: {
     label: "REJEITADO",
-    color: "hsl(var(--chart-4))",
+    color: "red",
   },
   PROCESSAMENTO_PENDENTE: {
     label: "PROCESSAMENTO PENDENTE",
-    color: "hsl(var(--chart-5))",
+    color: "yellow",
   },
   ERRO_PROCESSAMENTO: {
     label: "ERRO PROCESSAMENTO",
-    color: "hsl(var(--chart-6))",
+    color: "hsl(var(--chart-4))",
   },
   PROCESSANDO_PAGAMENTO: {
     label: "PROCESSANDO PAGAMENTO",
-    color: "hsl(var(--chart-7))",
+    color: "hsl(var(--chart-5))",
   },
 } satisfies ChartConfig
 
@@ -65,9 +69,10 @@ function App() {
   const [chartData, setChartData] = useState<any[]>([]);
   const [chartPieData, setChartPieData] = useState<any[]>([]);
 
-  function handleLineChartData(data: any) {
+  function handleLineChartData(data: any, data2?: any) {
     const monthlyReports: { [key: string]: number } = {};
-
+    const monthlyReports2: { [key: string]: number } = {};
+    
     // Array com os nomes dos meses em português
     const meses = [
         'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -86,24 +91,41 @@ function App() {
       }
     });
 
+    if(data2) {
+      data2.payload.forEach((report: any) => {
+        const date = new Date(report.createdAt);
+        const month = date.getMonth();
+  
+        // Incrementa a contagem para o mês correspondente
+        if (monthlyReports2[month]) {
+          monthlyReports2[month] += 1;
+        } else {
+          monthlyReports2[month] = 1;
+        }
+      });
+    }
+
     // Converte o objeto de contagem em um array para o chartData
-    const formattedChartData = meses.map((mes, index) => ({
-      createdAt: mes,
-      total: monthlyReports[index] ? monthlyReports[index] : 0
-    }));
+    const formattedChartData = meses.map((mes, index) => {
+      return {
+        createdAt: mes,
+        totalCurrentYear: monthlyReports[index] ? monthlyReports[index] : 0,
+        totalLastYear: monthlyReports2[index] ? monthlyReports2[index] : 0, 
+      };
+    });
 
     setChartData(formattedChartData);
   }
 
   function handlePieChartData(data: any) {
     const statusCounter = [
-      { label: 'ABERTO', count: 0, fill: 'white' },
-      { label: 'SUBMETIDO', count: 0, fill: 'blue' },
-      { label: 'REJEITADO', count: 0, fill: 'red' },
-      { label: 'APROVADO', count: 0, fill: 'green' },
-      { label: 'PROCESSAMENTO_PENDENTE', count: 0, fill: 'yellow' },
-      { label: 'ERRO_PROCESSAMENTO', count: 0, fill: 'purple' },
-      { label: 'PROCESSANDO_PAGAMENTO', count: 0, fill: 'pink' },
+      { label: 'ABERTO', count: 0, fill: 'var(--color-ABERTO)' },
+      { label: 'SUBMETIDO', count: 0, fill: 'var(--color-SUBMETIDO)' },
+      { label: 'REJEITADO', count: 0, fill: 'var(--color-REJEITADO)' },
+      { label: 'APROVADO', count: 0, fill: 'var(--color-APROVADO)' },
+      { label: 'PROCESSAMENTO_PENDENTE', count: 0, fill: 'var(--color-PROCESSAMENTO_PENDENTE)' },
+      { label: 'ERRO_PROCESSAMENTO', count: 0, fill: 'var(--color-ERRO_PROCESSAMENTO)' },
+      { label: 'PROCESSANDO_PAGAMENTO', count: 0, fill: 'var(--color-PROCESSANDO_PAGAMENTO)' },
   ];
 
   data.payload.forEach((report: any) => {
@@ -140,21 +162,36 @@ function App() {
 }
 
   async function fetchReports() {
-    const { data } = await api.get('/reports/findAllByCompany');
+    const currentYearReports = await api.get('/reports/findAllByCompany', {
+      params: {
+        query: {
+          year: new Date().getFullYear()
+        }
+      }
+    });
+
+    const lastYearReports = await api.get('/reports/findAllByCompany', {
+      params: {
+        query: {
+          year: Number(new Date().getFullYear())-1
+        }
+      }
+    });
     
-    handleLineChartData(data);
-    handlePieChartData(data);
+    handleLineChartData(currentYearReports.data, lastYearReports.data);
+    handlePieChartData(currentYearReports.data);
   }
 
   function ComponentLineChart() {
+    const year = Number(new Date().getFullYear().toString().slice(2,4))
     return (
       <Card className="">
         <CardHeader>
           <CardTitle>Relatórios do ano</CardTitle>
-          <CardDescription>Janeiro - Junho 2024</CardDescription>
+          <CardDescription>Janeiro - Dezembro 20{year-1}-{year}</CardDescription>
         </CardHeader>
         <CardContent>
-          <ChartContainer config={chartConfig} className=" w-auto">
+          <ChartContainer config={chartConfig} className="w-auto">
             <LineChart
               accessibilityLayer
               data={chartData}
@@ -176,25 +213,39 @@ function App() {
                 cursor={false}
                 content={<ChartTooltipContent indicator="line" />}
               />
+
               <Line
-                dataKey="total"
+                dataKey="totalLastYear"
                 type="natural"
-                stroke="var(--color-desktop)"
+                stroke="var(--color-totalLastYear)"
                 strokeWidth={2}
                 dot={{
-                  fill: "var(--color-desktop)",
+                  fill: "var(--color-totalLastYear)",
+                }}
+                activeDot={{
+                  r: 6,
+                }}
+              ></Line>
+
+              <Line
+                dataKey="totalCurrentYear"
+                type="natural"
+                stroke="var(--color-totalCurrentYear)"
+                strokeWidth={2}
+                dot={{
+                  fill: "var(--color-totalCurrentYear)",
                 }}
                 activeDot={{
                   r: 6,
                 }}
               >
-                <LabelList
-                  position="top"
-                  offset={12}
-                  className="fill-foreground"
-                  fontSize={12}
-                />
               </Line>
+              <LabelList
+                position="top"
+                offset={12}
+                className="fill-foreground"
+                fontSize={12}
+              />
             </LineChart>
           </ChartContainer>
         </CardContent>
@@ -213,7 +264,7 @@ function App() {
         <Card className="flex flex-col">
             <CardHeader className="items-center pb-0">
                 <CardTitle>Status Relatórios</CardTitle>
-                <CardDescription>Janeiro - Dezembro 2024</CardDescription>
+                <CardDescription>Todos relatórios</CardDescription>
             </CardHeader>
             <CardContent className="flex-1 pb-0">
                 <ChartContainer
@@ -224,7 +275,7 @@ function App() {
                         <Tooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
                         <Pie data={chartPieData} dataKey="count" nameKey="label" fill="gray"/>
                         <ChartLegend 
-                        content={<ChartLegendContent nameKey="label" />} 
+                        content={<ChartLegendContent nameKey="label" key={'label'}/>} 
                         className="-translate-y-2 text-[10px] grid grid-cols-3 gap-x-4 gap-y-2 [&>*]:items-center [&>*]:justify-left"
                         />
                     </PieChart>
