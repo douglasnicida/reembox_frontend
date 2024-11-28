@@ -14,7 +14,6 @@ import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
-import { AxiosError } from "axios";
 
 export default function ExpensePage() {
   const [q, setQ] = React.useState("");
@@ -108,11 +107,11 @@ export default function ExpensePage() {
 
   const renderCustomActions = (item: any) => {
     return (
-        <DropdownMenuItem className="cursor-pointer">
-            <a onClick={() => {setIsDialogOpen(true); setSelectedExpenseID(item.id)}}> Adicionar despesa a relatório </a>
+        <DropdownMenuItem className="cursor-pointer" onClick={() => {setIsDialogOpen(true); setSelectedExpenseID(item.id)}}>
+            Adicionar despesa a relatório
         </DropdownMenuItem>
     );
-};
+  };
 
 
   return (

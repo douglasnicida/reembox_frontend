@@ -17,15 +17,6 @@ import {
 import api from "./api/axios"
 import { useEffect, useState } from "react"
 
-
-const chartData2 = [
-  { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
-  { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
-  { browser: "firefox", visitors: 187, fill: "var(--color-firefox)" },
-  { browser: "edge", visitors: 173, fill: "var(--color-edge)" },
-  { browser: "other", visitors: 90, fill: "var(--color-other)" },
-]
-
 const chartConfig = {
   desktop: {
     label: "Desktop",
@@ -38,24 +29,25 @@ const chartConfig = {
 } satisfies ChartConfig
 
 const chartConfig2 = {
-  visitors: {
-    label: "Visitors",
+  count: {
+    label: "Contador",
+    color: "var(--color-total)",
   },
-  chrome: {
-    label: "Chrome",
-    color: "hsl(var(--chart-1))",
+  aberto: {
+    label: "ABERTO",
+    color: "var(--color-chrome)",
   },
-  safari: {
-    label: "Safari",
-    color: "hsl(var(--chart-2))",
+  submetido: {
+    label: "SUBMETIDO",
+    color: "var(--color-safari)",
   },
-  firefox: {
-    label: "Firefox",
-    color: "hsl(var(--chart-3))",
+  aprovado: {
+    label: "APROVADO",
+    color: "var(--color-firefox)",
   },
-  edge: {
-    label: "Edge",
-    color: "hsl(var(--chart-4))",
+  rejeitado: {
+    label: "REJEITADO",
+    color: "var(--color-edge)",
   },
   other: {
     label: "Other",
@@ -63,44 +55,9 @@ const chartConfig2 = {
   },
 } satisfies ChartConfig
 
-
-
-export function ComponentPie() {
-  return (
-    <Card className="flex flex-col">
-      <CardHeader className="items-center pb-0">
-        <CardTitle>Pie Chart</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
-      </CardHeader>
-      <CardContent className="flex-1 pb-0">
-        <ChartContainer
-          config={chartConfig2}
-          className="mx-auto aspect-square max-h-[250px]"
-        >
-          <PieChart>
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
-            <Pie data={chartData2} dataKey="visitors" nameKey="browser" />
-          </PieChart>
-        </ChartContainer>
-      </CardContent>
-      <CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex items-center gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-        </div>
-        <div className="leading-none text-muted-foreground">
-          Showing total visitors for the last 6 months
-        </div>
-      </CardFooter>
-    </Card>
-  )
-}
-
-
 function App() {
   const [chartData, setChartData] = useState<any[]>([]);
+  const [chartPieData, setChartPieData] = useState<any[]>([]);
 
   function handleLineChartData(data: any) {
     const monthlyReports: { [key: string]: number } = {};
@@ -132,10 +89,51 @@ function App() {
     setChartData(formattedChartData);
   }
 
+  function handlePieChartData(data: any) {
+    const statusCounter = [
+      { label: 'ABERTO', count: 0, fill: 'white' },
+      { label: 'SUBMETIDO', count: 0, fill: 'blue' },
+      { label: 'REJEITADO', count: 0, fill: 'red' },
+      { label: 'APROVADO', count: 0, fill: 'green' },
+      { label: 'PROCESSAMENTO PENDENTE', count: 0, fill: 'yellow' },
+      { label: 'ERRO PROCESSAMENTO', count: 0, fill: 'purple' },
+      { label: 'PROCESSANDO PAGAMENTO', count: 0, fill: 'pink' },
+  ];
+
+  data.payload.forEach((report: any) => {
+    switch(report.status) {
+        case 'OPEN':
+          statusCounter.find(status => status.label === 'ABERTO')!.count++;
+            break;
+        case 'SUBMITTED':
+            statusCounter.find(status => status.label === 'SUBMETIDO')!.count++;
+            break;
+        case 'REJECTED':
+            statusCounter.find(status => status.label === 'REJEITADO')!.count++;
+            break;
+        case 'APPROVED':
+            statusCounter.find(status => status.label === 'APROVADO')!.count++;
+            break;
+        case 'PROCESSING PENDING':
+            statusCounter.find(status => status.label === 'PROCESSAMENTO PENDENTE')!.count++;
+            break;
+        case 'PROCESSING ERROR':
+            statusCounter.find(status => status.label === 'ERRO PROCESSAMENTO')!.count++;
+            break;
+        case 'PROCESSING PAYMENT':
+            statusCounter.find(status => status.label === 'PROCESSANDO PAGAMENTO')!.count++;
+            break;
+    }
+  });
+
+    setChartPieData(statusCounter)
+  }
+
   async function fetchReports() {
     const { data } = await api.get('/reports/findAllByCompany');
     
     handleLineChartData(data);
+    handlePieChartData(data);
   }
 
   function ComponentLineChart() {
@@ -191,11 +189,38 @@ function App() {
           </ChartContainer>
         </CardContent>
         <CardFooter className="flex-col items-start gap-2 text-sm">
-          <div className="flex gap-2 font-medium leading-none">
-            Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-          </div>
           <div className="leading-none text-muted-foreground">
-            Mostrando total de relatórios criados
+            Total de relatórios criados por mês no ano de 2024
+          </div>
+        </CardFooter>
+      </Card>
+    )
+  }
+
+  function ComponentPie() {
+    return (
+      <Card className="flex flex-col">
+        <CardHeader className="items-center pb-0">
+          <CardTitle>Status Relatórios</CardTitle>
+          <CardDescription>Janeiro - Dezembro 2024</CardDescription>
+        </CardHeader>
+        <CardContent className="flex-1 pb-0">
+          <ChartContainer
+            config={chartConfig2}
+            className="mx-auto aspect-square max-h-[250px]"
+          >
+            <PieChart>
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent hideLabel />}
+              />
+              <Pie data={chartPieData} dataKey="count" nameKey="label" />
+            </PieChart>
+          </ChartContainer>
+        </CardContent>
+        <CardFooter className="flex-col gap-2 text-sm">
+          <div className="leading-none text-muted-foreground">
+            Total de relatórios por status
           </div>
         </CardFooter>
       </Card>
