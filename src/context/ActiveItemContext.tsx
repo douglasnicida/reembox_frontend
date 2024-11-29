@@ -46,10 +46,16 @@ export const ActiveItemProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         const location = window.location.pathname;
         
         setActiveItem('Início')
-        if(!location.includes('details')) {
+        if(!location.includes('details') && !location.includes('update')) {
             setActiveItem(RoutesMap[location]);
         } else {
-            setActiveItem('Detalhes')
+            if(location.includes('details')) {
+                setActiveItem('Detalhes')
+            }
+
+            if(location.includes('update')) {
+                setActiveItem('Alterar')
+            }
         }
 
 
