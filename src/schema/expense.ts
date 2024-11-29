@@ -60,6 +60,8 @@ export const ExpenseFormSchema = z.object({
     .positive("Categoria da despesa deve ser um ID numérico"),
 })
 
+
+
 export const ExpenseUpdateFormSchema = z.object({
   value: z
     .number({
@@ -99,5 +101,7 @@ export const ExpenseUpdateFormSchema = z.object({
     invalid_type_error: "Categoria deve ser um número",
   })
     .int("Categoria da despesa deve ser um ID numérico")
-    .positive("Categoria da despesa deve ser um ID numérico")
+    .positive("Categoria da despesa deve ser um ID numérico"),
+  receiptsId: z
+    .array(z.string())
 })

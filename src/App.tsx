@@ -1,4 +1,4 @@
-import { CartesianGrid, LabelList, Line, LineChart, XAxis, Pie, PieChart, Tooltip } from "recharts"
+import { CartesianGrid, LabelList, Line, LineChart, XAxis, Pie, PieChart, Tooltip, YAxis } from "recharts"
 import {
   Card,
   CardContent,
@@ -71,6 +71,8 @@ function App() {
   const [chartUserData, setChartUserData] = useState<any[]>([]);
   const [chartPieData, setChartPieData] = useState<any[]>([]);
 
+  const [maxCount, setMaxCount] = useState<number>(0);
+
   const { user } = useAuth()
 
   function handleLineChartData(data: any,  isUser: boolean, data2?: any) {
@@ -111,6 +113,17 @@ function App() {
 
     // Converte o objeto de contagem em um array para o chartData
     const formattedChartData = meses.map((mes, index) => {
+      let newMax;
+      if(data2) {
+        newMax = (monthlyReports[index] > monthlyReports2[index]) ? monthlyReports[index] : monthlyReports2[index];
+      } else {
+        newMax = monthlyReports[index]
+      }
+
+      if(newMax > maxCount) {
+        setMaxCount(newMax)
+      }
+
       return {
         createdAt: mes,
         totalCurrentYear: monthlyReports[index] ? monthlyReports[index] : 0,
@@ -203,6 +216,7 @@ function App() {
 
   function ComponentLineChart() {
     const year = Number(new Date().getFullYear().toString().slice(2,4))
+    const ticksArray = Array.from({length: maxCount + 3}, (_, index) => index)
     return (
       <Card className="">
         <CardHeader>
@@ -227,6 +241,13 @@ function App() {
                 axisLine={false}
                 tickMargin={8}
                 tickFormatter={(value) => value.slice(0, 3)}
+              />
+              <YAxis
+              domain={[0, maxCount+2]}
+              ticks={ticksArray}
+              tickLine={false}
+              axisLine={false}
+              tickMargin={3}
               />
               <ChartTooltip
                 cursor={false}
@@ -279,6 +300,7 @@ function App() {
 
   function ComponentUserLineChart() {
     const year = Number(new Date().getFullYear().toString().slice(2,4))
+    const ticksArray = Array.from({length: maxCount + 3}, (_, index) => index)
     return (
       <Card className="">
         <CardHeader>
@@ -304,6 +326,15 @@ function App() {
                 tickMargin={8}
                 tickFormatter={(value) => value.slice(0, 3)}
               />
+
+              <YAxis
+              domain={[0, maxCount+2]}
+              ticks={ticksArray}
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              />
+
               <ChartTooltip
                 cursor={false}
                 content={<ChartTooltipContent indicator="line" />}

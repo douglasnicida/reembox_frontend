@@ -29,12 +29,14 @@ import { Response } from "@/types/response.type"
 import { ExpenseUpdateFormSchema } from "@/schema/expense"
 import { toast } from "@/hooks/use-toast"
 import { useNavigate, useParams } from "react-router-dom"
-import { Loader2 } from "lucide-react"
+import { Loader2, XIcon } from "lucide-react"
 
 export default function UpdateExpensePage() {
   const [costCenters, setCostCenters] = useState<Param[]>([]);
   const [projects, setProjects] = useState<Param[]>([]);
   const [categories, setCategories] = useState<Param[]>([]);
+  const [reports, setReports] = useState<Param[]>([]);
+  const [receipts, setReceipts] = useState<any[]>([]);
 
 
   const [isLoading, setIsLoading] = useState(true);
@@ -60,10 +62,13 @@ export default function UpdateExpensePage() {
   async function fetchParams() {
     try {
       const { data } = await api.get<Response<ExpenseParams>>("/expenses/params");
-
       setCostCenters(data.payload.costCenters)
       setProjects(data.payload.projects)
       setCategories(data.payload.categories)
+      setReports(data.payload.reports)
+
+      const receiptsResponse = await api.get(`/expenses/${id}`) 
+      setReceipts(receiptsResponse.data.payload.receipts)
     } catch (err: any) {
       errorHandler(err);
     }
@@ -102,12 +107,20 @@ export default function UpdateExpensePage() {
   async function onSubmit(expense: z.infer<typeof ExpenseUpdateFormSchema>) {
 
     try {
+      const { receiptsId, ...expenseData } = expense
       const newExpense = {
-        ...expense       
+        ...expenseData      
       }
 
       // atualizando despesa
       await api.put(`/expenses/${id}`, newExpense)
+
+      //deletando recibos caso tenha algum selecionado
+      await api.delete('/receipts/', {
+        data: {
+          receiptsId: receiptsId
+        }
+      })
 
       toast({
         title: 'Sucesso!',
@@ -296,6 +309,51 @@ export default function UpdateExpensePage() {
                                 className="text-white hover:bg-zinc-600"
                               >
                                 {category.param}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage className="text-red-500"/>
+                      </FormItem>
+                    )}
+                  />
+
+                   {/* Recibos */}
+                  <FormField
+                    control={form.control}
+                    name="receiptsId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-white">Recibos</FormLabel>
+                        <Select 
+                          onValueChange={(value) => {
+                            // Adiciona ou remove o valor selecionado do array
+                            const currentValues = field.value || [];
+                            if (currentValues.includes(value)) {
+                              field.onChange(currentValues.filter((id) => id !== value));
+                            } else {
+                              field.onChange([...currentValues, value]);
+                            }
+                          }} 
+                        >
+                          <FormControl>
+                            <SelectTrigger className="bg-zinc-700 border-zinc-600 text-zinc-300">
+                              <SelectValue placeholder="Selecione todos recibos que deseja excluir da despesa" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="bg-zinc-700 border-zinc-600 max-h-[450px]">
+                            {receipts.map((receipt: any) => (
+                              <SelectItem 
+                                key={receipt.id} 
+                                value={receipt.id}
+                                className={`text-white hover:bg-zinc-700 mb-4
+                                  ${field.value?.includes(receipt.id.toString()) ? 'border-[2px] border-red-700/40' : ''}`}
+                              >
+                                <div className="flex gap-x-5 items-center relative w-full">
+                                {field.value?.includes(receipt.id.toString()) ? <div className="h-full w-[400px] bg-red-800/30 absolute" /> : ''}
+                                  <img key={receipt.id} src={receipt.url} width={400} alt="" />
+                                  <span className="text-red-600 font-bold">{field.value?.includes(receipt.id.toString()) ? <XIcon /> : ''}</span>
+                                </div>
                               </SelectItem>
                             ))}
                           </SelectContent>
