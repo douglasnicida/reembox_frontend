@@ -183,7 +183,7 @@ export default function Sidebar() {
     }, []);
 
     return (
-        <div className="w-[280px] bg-zinc-800 pt-4 pb-2 pl-4 h-screen flex flex-col border-r border-zinc-700">
+        <div className="w-[280px] bg-zinc-800 pt-4 pb-2 px-4 h-screen flex flex-col border-r border-zinc-700">
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <div className="py-0.5 px-2.5 h-16 flex gap-x-5 cursor-default" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
@@ -225,7 +225,7 @@ export default function Sidebar() {
                 <div>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button className="h-16 w-[225px] hover:bg-zinc-700 flex gap-x-3 fixed bottom-2 -ml-[8px]" variant={"ghost"}>
+                            <Button className="h-16 w-[225px] hover:bg-zinc-700 flex gap-x-3 fixed bottom-2 -ml-[5px]" variant={"ghost"}>
                                 <img src={`https://ui-avatars.com/api/?name=${user && user.name}&background=random&rounded=true&size=40`} alt="" />
                                 <div className="flex flex-col text-left w-fit">
                                     <span className="text-sm">{user && user.name}</span>
