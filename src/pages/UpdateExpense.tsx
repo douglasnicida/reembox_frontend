@@ -35,7 +35,7 @@ export default function UpdateExpensePage() {
   const [costCenters, setCostCenters] = useState<Param[]>([]);
   const [projects, setProjects] = useState<Param[]>([]);
   const [categories, setCategories] = useState<Param[]>([]);
-  const [reports, setReports] = useState<Param[]>([]);
+  // const [reports, setReports] = useState<Param[]>([]);
   const [receipts, setReceipts] = useState<any[]>([]);
 
 
@@ -65,7 +65,7 @@ export default function UpdateExpensePage() {
       setCostCenters(data.payload.costCenters)
       setProjects(data.payload.projects)
       setCategories(data.payload.categories)
-      setReports(data.payload.reports)
+      // setReports(data.payload.reports)
 
       const receiptsResponse = await api.get(`/expenses/${id}`) 
       setReceipts(receiptsResponse.data.payload.receipts)

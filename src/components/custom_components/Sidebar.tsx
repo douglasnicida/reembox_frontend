@@ -183,7 +183,7 @@ export default function Sidebar() {
     }, []);
 
     return (
-        <div className="w-64 bg-zinc-800 p-4 h-screen flex flex-col border-r border-zinc-700">
+        <div className="w-[280px] bg-zinc-800 pt-4 pb-2 pl-4 h-screen flex flex-col border-r border-zinc-700">
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <div className="py-0.5 px-2.5 h-16 flex gap-x-5 cursor-default" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
@@ -200,54 +200,57 @@ export default function Sidebar() {
                 </DropdownMenuTrigger>
             </DropdownMenu>
 
-            <nav className="flex flex-col w-full h-[calc(100vh-165px)] overflow-y-scroll mt-4">
-                <SidebarItem Icon={Home} label="Início" active={activeItem === "Início"} onClick={() => handleItemClick("Início", "/home")} />
-                <Separator className="my-2 bg-zinc-700" />
-                {sideBarItems["sections"].map((section: any, index: number) => {
-                    const sidebar = [];
-                    section.items.forEach((item: any) => {
-                        if (item.roles.includes(role) || item.roles.length === 0) {
-                            sidebar.push(
-                                <SidebarItem key={item.label} Icon={item.Icon} label={item.label} active={activeItem === item.label} onClick={() => handleItemClick(item.label, item.path)} />
+            <nav className="flex flex-col w-full h-[calc(100vh-170px)] overflow-y-auto overflow-x-hidden mt-4 justify-between">
+                <div className="">
+                    <SidebarItem Icon={Home} label="Início" active={activeItem === "Início"} onClick={() => handleItemClick("Início", "/home")} />
+                    <Separator className="my-2 bg-zinc-700" />
+                    {sideBarItems["sections"].map((section: any, index: number) => {
+                        const sidebar = [];
+                        section.items.forEach((item: any) => {
+                            if (item.roles.includes(role) || item.roles.length === 0) {
+                                sidebar.push(
+                                    <SidebarItem key={item.label} Icon={item.Icon} label={item.label} active={activeItem === item.label} onClick={() => handleItemClick(item.label, item.path)} />
+                                );
+                            }
+                        });
+                        if (sidebar.length !== 0) {
+                            sidebar.unshift(
+                                <p key={index} className="flex h-8 shrink-0 items-center text-xs font-medium text-sidebar-foreground/70">{section.title}</p>
                             );
                         }
-                    });
-                    if (sidebar.length !== 0) {
-                        sidebar.unshift(
-                            <p key={index} className="flex h-8 shrink-0 items-center text-xs font-medium text-sidebar-foreground/70">{section.title}</p>
-                        );
-                    }
-                    return sidebar;
-                })}
+                        return sidebar;
+                    })}
+                </div>
+
+                <div>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button className="h-16 w-[225px] hover:bg-zinc-700 flex gap-x-3 fixed bottom-2 -ml-[8px]" variant={"ghost"}>
+                                <img src={`https://ui-avatars.com/api/?name=${user && user.name}&background=random&rounded=true&size=40`} alt="" />
+                                <div className="flex flex-col text-left w-fit">
+                                    <span className="text-sm">{user && user.name}</span>
+                                    <span className="shrink-0 text-xs font-medium text-sidebar-foreground/70">{user && user.username}</span>
+                                </div>
+                                <ChevronsUpDown />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent side="top" className="w-[--radix-popper-anchor-width] flex flex-col gap-y-2">
+                                <DropdownMenuItem onClick={() => {navigate('/my-account')}} className="cursor-pointer h-10">
+                                    <span className="flex gap-x-3 items-center"><CircleUser size={16} />Minha Conta</span>
+                                </DropdownMenuItem>
+                                <Separator className="bg-zinc-700" />
+                                <DropdownMenuItem onClick={() => {navigate('/config')}} className="cursor-pointer h-10">
+                                    <span className="flex gap-x-3 items-center"><Settings size={16} />Configurações</span>
+                                </DropdownMenuItem>
+                                <Separator className="bg-zinc-700" />
+                                <DropdownMenuItem onClick={logout} className="cursor-pointer h-10">
+                                    <span className="flex gap-x-3 items-center"><LogOut size={16} />Sair</span>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
             </nav>
 
-            <div className="absolute bottom-0 left-0">
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button className="h-16 hover:bg-zinc-700 flex gap-x-5" variant={"ghost"}>
-                            <img src={`https://ui-avatars.com/api/?name=${user && user.name}&background=random&rounded=true&size=40`} alt="" />
-                            <div className="flex flex-col text-left w-fit">
-                                <span className="text-sm">{user && user.name}</span>
-                                <span className="shrink-0 text-xs font-medium text-sidebar-foreground/70">{user && user.username}</span>
-                            </div>
-                            <ChevronsUpDown />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent side="top" className="w-[--radix-popper-anchor-width] flex flex-col gap-y-2">
-                            <DropdownMenuItem onClick={() => {navigate('/my-account')}} className="cursor-pointer h-10">
-                                <span className="flex gap-x-3 items-center"><CircleUser size={16} />Minha Conta</span>
-                            </DropdownMenuItem>
-                            <Separator className="bg-zinc-700" />
-                            <DropdownMenuItem onClick={() => {navigate('/config')}} className="cursor-pointer h-10">
-                                <span className="flex gap-x-3 items-center"><Settings size={16} />Configurações</span>
-                            </DropdownMenuItem>
-                            <Separator className="bg-zinc-700" />
-                            <DropdownMenuItem onClick={logout} className="cursor-pointer h-10">
-                                <span className="flex gap-x-3 items-center"><LogOut size={16} />Sair</span>
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                </DropdownMenu>
-            </div>
         </div>
     );
 }
