@@ -10,14 +10,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Filter, LoaderPinwheel } from "lucide-react";
+import { Search, Filter } from "lucide-react";
 import TableComponent from "@/components/custom_components/TableComponent";
 import { Customer } from "@/types/models.type";
 import { Toaster } from "@/components/ui/toaster";
 import { errorHandler } from "@/utils/errorHandler";
 
 import api from "@/api/axios";
-import { Paginated, PaginatedResponse } from "@/types/response.type";
+import { Paginated, PaginatedResponse, Response } from "@/types/response.type";
 import CreationDialog from "@/components/custom_components/CreationDialog";
 import { dtoList } from "@/lib/utils";
 import { dtoUpdateList } from "@/lib/utilsUpdate";
@@ -28,8 +28,6 @@ import ApprovalRAGDialog from "./ApprovalRAGDialog";
 export default function CustomerPage() {
   const [q, setQ] = useState<string>("");
   const [active, setActive] = useState<boolean | undefined>(undefined);
-  const [loading, setLoading] = React.useState<boolean>(true);
-  const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
   const [data, setData] = useState<Paginated<Customer>>({
     items: [],
     totalItems: 0,
@@ -37,12 +35,14 @@ export default function CustomerPage() {
     currentPage: 1,
     size: 10,
   });
+  const [rags, setRags] = useState<Response<any>>([])
   const [editId, setEditId] = useState<number | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const { activeItem,reload } = useActiveItem();
+  const { activeItem } = useActiveItem();
+
+  const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
 
   async function fetchCustomers(page: number, size: number = 10) {
-    setLoading(true)
     try {
       const params: Record<string, any> = { page, size };
 
@@ -61,12 +61,22 @@ export default function CustomerPage() {
     } catch (err: any) {
       errorHandler(err);
     }
-    setLoading(false)
+  }
+
+  async function fetchRags() {
+    try {
+      const { data } = await api.get<Response<any>>("/rag");
+
+      setRags(data);
+    } catch (err: any) {
+      errorHandler(err);
+    }
   }
 
   useEffect(() => {
     fetchCustomers(1);
-  }, [active,reload]);
+    fetchRags();
+  }, [active]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -77,6 +87,7 @@ export default function CustomerPage() {
     setEditId(id);
     setIsEditModalOpen(true);
   };
+  
   const handleCloseEditModal = () => {
     setEditId(null);
     setIsEditModalOpen(false);
@@ -84,17 +95,22 @@ export default function CustomerPage() {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const renderCustomActions = (item: Customer) => (
-      <>
-      <DropdownMenuItem onClick={() => {
-          setSelectedCustomerId(item.id);
-          setIsDialogOpen(true);
-        }}>
-        Aprovar RAG
-      </DropdownMenuItem>
-    </>
-  );
-
+  const renderCustomActions = (item: Customer) => {
+    console.log(rags);
+    
+    if (!rags.payload.find((r: any) => r.customerId === item.id)) {
+      return (
+        <>
+          <DropdownMenuItem onClick={() => {
+              setSelectedCustomerId(item.id);
+              setIsDialogOpen(true);
+            }}>
+            <b className="text-red-500">Aprovar RAG</b>
+          </DropdownMenuItem>
+        </>
+      )
+    }
+  }
 
   return (
     <>
@@ -116,7 +132,6 @@ export default function CustomerPage() {
                 }}
               />
             </div>
-
             <CreationDialog dtoList={dtoList.dtos} currentLabel={activeItem} />
             
             <DropdownMenu>
@@ -152,21 +167,14 @@ export default function CustomerPage() {
         </form>
 
         <div className="p-4">
-          {
-            loading ?
-            <div className="w-full h-[calc(100vh-234px)] flex justify-center items-center">
-              <LoaderPinwheel className="animate-spin h-20 w-20" />
-            </div>
-            :
-            <TableComponent
-              resource="customers"
-              data={data}
-              columnHeaders={['Nome', 'Telefone', 'E-mail', 'Criado em', 'Atualizado em', 'Ativo' ]}
-              onPageChange={fetchCustomers}
-              customActions={renderCustomActions}
-              onEdit={handleOpenEditModal}
-            />
-          }
+          <TableComponent 
+            resource="customers"
+            data={data}
+            columnHeaders={['Nome', 'Telefone', 'E-mail', 'Criado em', 'Atualizado em', 'Ativo' ]} 
+            onPageChange={fetchCustomers}
+            onEdit={handleOpenEditModal}
+            customActions={renderCustomActions}
+          />
         </div>
       </div>
       {isEditModalOpen && (

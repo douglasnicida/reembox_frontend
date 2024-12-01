@@ -19,9 +19,13 @@ import api from "@/api/axios"
 import { errorHandler } from "@/utils/errorHandler"
 import { Toaster } from "@/components/ui/toaster"
 import { Paginated, PaginatedResponse } from "@/types/response.type"
+import UpdateDialog from "@/components/custom_components/UpdateDialog"
 
 export default function CollaboratorPage() {
   const [q, setQ] = React.useState("")
+  const [active, setActive] = React.useState<boolean | undefined>(undefined);
+  const [editId, setEditId] = React.useState<number | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
 
   const [data, setData] = React.useState<Paginated<Collaborator>>({
     items: [],
@@ -30,6 +34,17 @@ export default function CollaboratorPage() {
     currentPage: 1,
     size: 10,
   });
+
+  const handleOpenEditModal = (id: number) => {
+    setEditId(id);
+    setIsEditModalOpen(true);
+};
+
+const handleCloseEditModal = () => {
+    setEditId(null);
+    setIsEditModalOpen(false);
+};
+
 
   async function fetchEmployees(page: number, size: number = 10) {
     try {
@@ -65,53 +80,44 @@ export default function CollaboratorPage() {
         
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="gap-2">
-              <Filter className="h-4 w-4" />
-              <span>Filtros</span>
-            </Button>
+              <Button variant="outline" className="gap-2">
+                  <Filter className="h-4 w-4" />
+                  <span>Filtros</span>
+              </Button>
           </DropdownMenuTrigger>
 
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>Filtrar por</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuCheckboxItem
-              checked={filterOptions.active}
-              onCheckedChange={(checked) =>
-                setFilterOptions((prev) => ({ ...prev, active: checked }))
-              }
-            >
-              Ativos
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={filterOptions.inactive}
-              onCheckedChange={(checked) =>
-                setFilterOptions((prev) => ({ ...prev, inactive: checked }))
-              }
-            >
-              Inativos
-            </DropdownMenuCheckboxItem>
-
-            <DropdownMenuSeparator />
-            <DropdownMenuCheckboxItem
-              checked={filterOptions.withAddress}
-              onCheckedChange={(checked) =>
-                setFilterOptions((prev) => ({ ...prev, withAddress: checked }))
-              }
-            >
-              Com endereço
-            </DropdownMenuCheckboxItem>
-
-            <DropdownMenuCheckboxItem
-              checked={filterOptions.withoutAddress}
-              onCheckedChange={(checked) =>
-                setFilterOptions((prev) => ({ ...prev, withoutAddress: checked }))
-              }
-            >
-              Sem endereço
-            </DropdownMenuCheckboxItem>
+              <DropdownMenuLabel>Filtrar por</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuCheckboxItem
+                  checked={active === true}
+                  onCheckedChange={(checked) => {
+                      setActive(checked ? true : undefined); 
+                  }}
+              >
+                  Ativos
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                  checked={active === false}
+                  onCheckedChange={(checked) => {
+                      setActive(checked ? false : undefined); 
+                  }}
+              >
+                  Inativos
+              </DropdownMenuCheckboxItem>
           </DropdownMenuContent>
-        </DropdownMenu>
+      </DropdownMenu>
       </div>
+
+      {isEditModalOpen && (
+        <UpdateDialog
+            dtoList={dtoUpdateList.dtos}
+            currentLabel="Centros de Custo"
+            editId={editId}
+            isOpen={isEditModalOpen}
+            onClose={handleCloseEditModal}
+        />
+      )}
 
       <div className="p-4">
         <TableComponent 
@@ -119,6 +125,7 @@ export default function CollaboratorPage() {
           data={data}
           columnHeaders={['CPF', 'Nome', 'Telefone', 'Cargo', 'Criado em', 'Atualizado em', 'Ativo' ]}
           onPageChange={fetchEmployees}
+          onEdit={handleOpenEditModal}
         />
       </div>
     <Toaster />
