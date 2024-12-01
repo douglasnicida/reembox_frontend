@@ -202,11 +202,11 @@ export default function CreateAllocationPage() {
                     name="projectId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-white">Relatório <span className="text-red-500">*</span></FormLabel>
+                        <FormLabel className="text-white">Projeto <span className="text-red-500">*</span></FormLabel>
                         <Select onValueChange={(value) => field.onChange(Number(value))}  defaultValue={String(field.value)}>
                           <FormControl>
                             <SelectTrigger className="bg-zinc-700 border-zinc-600 text-zinc-300">
-                              <SelectValue placeholder="Selecione um relatório" />
+                              <SelectValue placeholder="Selecione um projeto" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent className="bg-zinc-700 border-zinc-600">

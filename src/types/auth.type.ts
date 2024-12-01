@@ -1,7 +1,13 @@
 type TokenType = {
     username: string;
     name: string;
-    company: string;
+    company: string; 
+    rag: {
+        id: string;
+        embeddingModel: string;
+        folderId: string;
+        llmModel: string;
+    }
 }
 
 type LoginType = {

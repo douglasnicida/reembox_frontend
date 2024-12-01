@@ -6,17 +6,19 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/compone
 import { Input } from "@/components/ui/input";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"; // Importe o Select
 import api from "@/api/axios";
 import { toast } from "@/hooks/use-toast";
 import { errorHandler } from "@/utils/errorHandler";
 
-// Definição do schema Zod para validação
 const approvalRagSchema = z.object({
   remarks: z.string().optional(),
-  modelInfo: z
+  llmModel: z
     .string()
     .min(3, "O campo deve conter pelo menos 3 caracteres")
-    .max(255, "O campo não pode ter mais que 255 caracteres")
+    .max(255, "O campo não pode ter mais que 255 caracteres"),
+  embeddingModel: z
+    .string()
 });
 
 // Tipagem derivada do schema Zod
@@ -33,7 +35,8 @@ function ApprovalRAGDialog({ customerId, open, onOpenChange }: ApprovalRAGDialog
     resolver: zodResolver(approvalRagSchema),
     defaultValues: {
       remarks: "",
-      modelInfo: "",
+      llmModel: "",
+      embeddingModel: "",
     },
   });
 
@@ -66,12 +69,63 @@ function ApprovalRAGDialog({ customerId, open, onOpenChange }: ApprovalRAGDialog
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="modelInfo"
+              name="llmModel"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Modelo <span className="text-red-500">*</span></FormLabel>
                   <FormControl>
-                    <Input placeholder="Informe o modelo" {...field} />
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="bg-zinc-700 border-zinc-600 text-zinc-300">
+                          <SelectValue placeholder="Selecione um modelo" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="bg-zinc-700 border-zinc-600">
+                        <SelectItem value="llama3.1:8b" className="text-white hover:bg-zinc-600">
+                          llama3.1:8b
+                        </SelectItem>
+                        <SelectItem value="llama3.1:70b" className="text-white hover:bg-zinc-600">
+                          llama3.1:70b
+                        </SelectItem>
+                        <SelectItem value="gpt-4" className="text-white hover:bg-zinc-600">
+                          gpt-4
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="embeddingModel"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Modelo de Embedding <span className="text-red-500">*</span></FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="bg-zinc-700 border-zinc-600 text-zinc-300">
+                          <SelectValue placeholder="Selecione um modelo de embedding" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="bg-zinc-700 border-zinc-600">
+                        <SelectItem value="ollama::nomic-embed-text" className="text-white hover:bg-zinc-600">
+                          ollama::nomic-embed-text
+                        </SelectItem>
+                        <SelectItem value="openai::text-embedding-ada-002" className="text-white hover:bg-zinc-600">
+                          openai::text-embedding-ada-002
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
