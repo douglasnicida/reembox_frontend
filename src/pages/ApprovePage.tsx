@@ -102,11 +102,11 @@ export default function ApprovePage() {
       const reportStatus = statusColors[currentReport.status];
     
       return (
-        <Card className="w-[340px] h-[240px] relative">
+        <Card className="w-[340px] h-[250px] relative">
           <OpenInNewWindowIcon className="h-5 w-5 absolute top-3 right-3 hover:scale-110 cursor-pointer" onClick={() => {navigate(`/reports/${currentReport.id}/details`);}} />
           <CardHeader>
-            <CardTitle>{currentReport.name}</CardTitle>
-            <CardDescription>{currentReport.goal}</CardDescription>
+            <CardTitle>{currentReport.name.length > 20 ? currentReport.name.slice(0,22) : currentReport.name}</CardTitle>
+            <CardDescription>{(currentReport.goal.length > 71) ? currentReport.goal.slice(0,70) + '...' : currentReport.goal}</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-y-2 text-sm relative h-auto">
             <p>Criador do relatório: {currentReport.creator}</p>
@@ -177,7 +177,7 @@ export default function ApprovePage() {
             <Button variant="default" className="text-sm font-bold" onClick={() => {navigate("/reports/new");}}>Criar +</Button>
           </div>
 
-          <div className="p-9 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 overflow-y-scroll overflow-x-hidden w-fit mx-auto">
+          <div className="p-9 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 overflow-y-scroll h-[calc(100vh-400px)] overflow-x-hidden w-fit mx-auto">
             
             {
               loading ? (

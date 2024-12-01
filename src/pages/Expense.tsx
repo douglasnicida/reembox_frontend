@@ -171,6 +171,7 @@ export default function ExpensePage() {
               columnHeaders={['Data da Despesa', 'Valor total', 'Cód. Projeto', 'Cód. Centro de Custo', 'Tipo de Despesa']} 
               onPageChange={fetchExpenses}
               customActions={renderCustomActions}
+              onEdit={(item: any) => navigate(`/expense/update/${item}`)}
             />
           }
         </div>
