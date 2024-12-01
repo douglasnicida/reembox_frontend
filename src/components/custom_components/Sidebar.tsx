@@ -177,6 +177,7 @@ export default function Sidebar() {
         async function getUserRole() {
             const { data } = await api.get('/auth/getRole');
             const rolePayload = data.payload;
+            
             setRole(rolePayload);
         }
         getUserRole();

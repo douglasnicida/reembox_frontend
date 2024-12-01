@@ -93,7 +93,7 @@ function ApprovalReportCard({report, navigate}: ApprovalReportCardProps) {
   const reportStatus = statusColors[currentReport.status];
 
   return (
-    <Card className="w-[340px] h-[240px] relative">
+    <Card className="w-[340px] h-[250px] relative">
       <OpenInNewWindowIcon className="h-5 w-5 absolute top-3 right-3 hover:scale-110 cursor-pointer" onClick={() => {navigate(`/reports/${currentReport.id}/details`);}} />
       <CardHeader>
         <CardTitle>{currentReport.name}</CardTitle>
